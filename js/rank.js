@@ -5,6 +5,7 @@ $(function(){
         if($(t).hasClass('rmvIt')){
             $(t).closest('tr').fadeOut(500, function(){
                 $(this).remove();
+                if($('.beenRatedRank').length == 0) {$('.table').fadeOut(500)};
             })
         }
     });
@@ -38,7 +39,6 @@ $(function(){
 
     $('.cloneBtn').click(function(e){
         e.preventDefault();
-        $('.table').fadeIn(500);
 
         var cloneMe = $('.cloneMeSon:eq(0)');
         var cloneMeRanking = $('.stars:eq(0)').clone();
@@ -49,6 +49,7 @@ $(function(){
         if (listItem === '') {
             alert('What the hell! Add a list item. Anything!');
         } else {
+            $('.table').fadeIn(500);
             appendData.find('td.saveList').append(listItem);
             appendData.find('td.saveRank').append(storeRanking(cloneMeRanking));
             appendClone.append(appendData);
