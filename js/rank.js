@@ -36,7 +36,8 @@ $(function(){
         el.prevAll('.star').addClass('beenRated');
     });
 
-    $('.cloneBtn').click(function(){
+    $('.cloneBtn').click(function(e){
+        e.preventDefault();
         $('.table').fadeIn(500);
 
         var cloneMe = $('.cloneMeSon:eq(0)');
