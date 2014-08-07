@@ -1,0 +1,81 @@
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <nav class="navbar navbar-inverse" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="http://www.github.com/steveperrito">List it 'n rank it!</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                   <li>
+                       <a href="#">
+                           <div class="btn-group">
+                               <button type="button" class="btn btn-primary active btn-xs">
+                                   <span class="glyphicon glyphicon-thumbs-up"></span> GitHub
+                               </button>
+                           </div>
+                       </a>
+                   </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 well">
+                    <h2>Rank item below</h2>
+                <form action="#" class="form-inline" role="form">
+                    <input class="listItem" type="text"/>
+
+                    <div class="stars">
+                        <span class="star glyphicon glyphicon-star"></span>
+                        <span class="star glyphicon glyphicon-star"></span>
+                        <span class="star glyphicon glyphicon-star"></span>
+                        <span class="star glyphicon glyphicon-star"></span>
+                        <span class="star glyphicon glyphicon-star"></span>
+                    </div>
+                    <button class="btn btn-primary btn-xs cloneBtn">Rank Item</button>
+
+                </form>
+            </div>
+        </div>
+        <div style="display: none;">
+            <table class="table">
+                <tbody>
+                <tr class="cloneMeSon">
+                    <td class="saveList"></td>
+                    <td class="saveRank"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <table class="table">
+                    <tr>
+                        <th>List Item</th>
+                        <th>Item Ranking</th>
+                    </tr>
+                    <tbody class="appendClone">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/rank.js"></script>
+</body>
+</html>

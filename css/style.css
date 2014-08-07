@@ -1,0 +1,30 @@
+html {
+    background: #FDFDFD;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stars {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.active, .beenRated {
+    color: #EFCC00;
+}
+
+.beenRatedRank {
+    color: #EFCC00;
+}
+
+form {
+    width: 600px;
+    margin: inherit;
+}
+
+.well{
+    background: rgba(204,204,204,.5);
+}
