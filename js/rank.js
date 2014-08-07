@@ -1,5 +1,18 @@
 
 $(function(){
+    $('#items').on('click', function(e){
+        var t = e.target;
+        if($(t).hasClass('rmvIt')){
+            $(t).closest('tr').fadeOut(500, function(){
+                $(this).remove();
+            })
+        }
+    });
+
+    $('.github').click(function(){
+        window.location = 'https://github.com/steveperrito/list_rank';
+    });
+
     $('.stars').on('mouseover', '.star', function(){
         var el = $(this);
         el.addClass('active');
@@ -24,6 +37,8 @@ $(function(){
     });
 
     $('.cloneBtn').click(function(){
+        $('.table').fadeIn(500);
+
         var cloneMe = $('.cloneMeSon:eq(0)');
         var cloneMeRanking = $('.stars:eq(0)').clone();
         var appendClone = $('.appendClone');
@@ -53,5 +68,5 @@ $(function(){
             return div;
         }
 
-    })
+    });
 });

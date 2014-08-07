@@ -28,3 +28,19 @@ form {
 .well{
     background: rgba(204,204,204,.5);
 }
+
+.cloneBtn {
+    margin-left: 5px;
+}
+
+span.glyphicon-star {
+    font-size: 1.2em;
+}
+
+.table {
+    display: none;
+}
+
+.rmvIt {
+    cursor: pointer;
+}
