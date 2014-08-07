@@ -10,6 +10,7 @@ h1, h2, h3, h4, h5, h6 {
 .stars {
     display: inline-block;
     margin-left: 10px;
+    cursor: pointer;
 }
 
 .active, .beenRated {
@@ -43,4 +44,8 @@ span.glyphicon-star {
 
 .rmvIt {
     cursor: pointer;
+}
+
+.star {
+    margin-left: -3px;
 }
