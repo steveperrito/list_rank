@@ -46,8 +46,8 @@ $(function(){
         var appendData = cloneMe.clone();
         var listItem = $('.listItem').val();
 
-        if (listItem === '') {
-            alert('What the hell! Add a list item. Anything!');
+        if (listItem === '' || $('.beenRated').length == 0) {
+            alert('What the hell! Add a list item Or at least Rank it!');
         } else {
             $('.table').fadeIn(500);
             appendData.find('td.saveList').append(listItem);
