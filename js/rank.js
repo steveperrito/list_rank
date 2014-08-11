@@ -1,5 +1,16 @@
 
 $(function(){
+    var fixHelper = function(e, ui) {
+        ui.children().each(function() {
+            $(this).width($(this).width());
+        });
+        return ui;
+    };
+
+    $('.appendClone').sortable({
+        helper: fixHelper
+    }).disableSelection();
+
     $('#items').on('click', function(e){
         var t = e.target;
         if($(t).hasClass('rmvIt')){
@@ -64,7 +75,6 @@ $(function(){
             div.find('.beenRated').each(function(){
                 $(this).addClass('beenRatedRank');
                 $(this).removeClass('beenRated');
-                $(this).removeClass('star');
                 $(this).removeClass('active');
             });
             return div;

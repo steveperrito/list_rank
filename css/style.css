@@ -49,3 +49,17 @@ span.glyphicon-star {
 .star {
     margin-left: -3px;
 }
+
+.glyphicon-move {
+    cursor: grab;
+    cursor: -webkit-grab;
+}
+
+.glyphicon-move:active {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+}
+
+table tbody tr {
+    background: white;
+}
