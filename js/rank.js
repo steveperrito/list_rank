@@ -8,7 +8,12 @@ $(function(){
     };
 
     $('.appendClone').sortable({
-        helper: fixHelper
+        helper: fixHelper,
+        axis: "y",
+        containment: "parent",
+        handle: ".glyphicon-sort",
+        revert: false,
+        tolerance: "pointer"
     }).disableSelection();
 
     $('#items').on('click', function(e){
@@ -18,6 +23,10 @@ $(function(){
                 $(this).remove();
                 if($('.beenRatedRank').length == 0) {$('.table').fadeOut(500)};
             })
+        } else if ($(t).hasClass('glyphicon-ok-circle')){
+            $(t).closest('tr').toggleClass('chkedOff');
+        } else {
+            return 0;
         }
     });
 

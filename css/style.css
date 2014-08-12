@@ -50,16 +50,20 @@ span.glyphicon-star {
     margin-left: -3px;
 }
 
-.glyphicon-move {
+.glyphicon-sort {
     cursor: grab;
     cursor: -webkit-grab;
 }
 
-.glyphicon-move:active {
+.glyphicon-sort:active {
     cursor: grabbing;
     cursor: -webkit-grabbing;
 }
 
 table tbody tr {
     background: white;
+}
+
+.chkedOff {
+    opacity: 0.25;
 }
