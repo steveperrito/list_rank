@@ -67,3 +67,8 @@ table tbody tr {
 .chkedOff {
     opacity: 0.25;
 }
+
+.nowRated {
+    margin-left: -3px;
+    cursor: default;
+}
