@@ -72,3 +72,7 @@ table tbody tr {
     margin-left: -3px;
     cursor: default;
 }
+
+.editable {
+    border: 0;
+}

@@ -1,5 +1,12 @@
 
 $(function(){
+    $('.github').click(function(){
+        window.location = 'https://github.com/steveperrito/list_rank';
+    });
+});
+
+$(function(){
+    setListeners();
     var getTheStored = JSON.parse(localStorage.getItem('savedList'));
     var toLocalStorage = [];
 
@@ -43,7 +50,6 @@ $(function(){
                 return a.sortOrder - b.sortOrder;
             });
             storeItBaby(toLocalStorage);
-            console.log(toLocalStorage);
         }
     }).disableSelection();
 
@@ -57,7 +63,6 @@ $(function(){
                         var indexOfAry = toLocalStorage.indexOf(e);
                         toLocalStorage.splice(indexOfAry, 1);
                         storeItBaby(toLocalStorage);
-                        console.log(toLocalStorage);
                     } else {
                         return 0;
                     }
@@ -72,42 +77,104 @@ $(function(){
                 if(thisTR.attr('data-guid') == e.id){
                     e.checked = !e.checked;
                     storeItBaby(toLocalStorage);
-                    console.log(toLocalStorage);
                 } else {
                     return 0;
                 }
             });
+        } else if ($(t).hasClass('saveList')){
+            var thisTd = $(t).closest('td');
+            var thisTR = $(t).closest('tr');
+            var itemID = thisTR.attr('data-guid');
+            var indexOfItem;
+            var tdLength = thisTd.width();
+            var frmField = $('<input />', {
+                'class': 'editable',
+                'width': ((tdLength<100)?'100':tdLength)
+            });
+            var originalText = thisTd.text();
+            toLocalStorage.forEach(function(e){
+                if(itemID == e.id){
+                    indexOfItem = toLocalStorage.indexOf(e);
+                }
+            });
+
+            frmField.val(originalText);
+            thisTd.empty();
+            thisTd.append(frmField);
+            frmField.select();
+
+            frmField.on('input', function(){
+                toLocalStorage[indexOfItem].item = $(this).val();
+                storeItBaby(toLocalStorage);
+            });
+            frmField.on('blur', function(){
+                var newText = $(this).val();
+                thisTd.empty();
+                thisTd.text(newText);
+            })
+        } else if ($(t).hasClass('nowRated')){
+            var parentDiv = $(t).closest('div');
+            parentDiv.addClass('stars');
+            parentDiv.find('.beenRatedRank').each(function(){
+                $(this).addClass('beenRated');
+                $(this).removeClass('beenRatedRank');
+            });
+            parentDiv.find('.nowRated').each(function(){
+                $(this).addClass('star wasChanged');
+                $(this).removeClass('nowRated');
+            });
+            setListeners();
+        } else if ($(t).hasClass('wasChanged')){
+            var closestTR = $(t).closest('tr');
+            var closestTD = $(t).closest('td');
+            var parentDiv = $(t).closest('div');
+            var starRankID = closestTR.attr('data-guid');
+            var indexOfStarRank;
+
+            toLocalStorage.forEach(function(e){
+                if(starRankID == e.id){
+                    indexOfStarRank = toLocalStorage.indexOf(e);
+                }
+            });
+
+            toLocalStorage[indexOfStarRank].stars = parentDiv.find('.beenRated').length;
+            storeItBaby(toLocalStorage);
+
+            parentDiv.find('.wasChanged').each(function(){
+                $(this).removeClass('star wasChanged');
+            });
+            var updatedRank = storeRanking(parentDiv);
+            closestTD.empty();
+            closestTD.append(updatedRank);
         } else {
             return 0;
         }
     });
 
-    $('.github').click(function(){
-        window.location = 'https://github.com/steveperrito/list_rank';
-    });
-
-    $('.stars').on('mouseover', '.star', function(){
-        var el = $(this);
-        el.addClass('active');
-        el.prevAll('.star').addClass('active');
-    });
-
-    $('.stars').on('mouseout', '.star', function() {
-        var el = $(this);
-        el.removeClass('active');
-        el.prevAll('.star').removeClass('active');
-    });
-
-    $('.stars').on('click', '.star', function(){
-        var el = $(this);
-        $('.beenRated').each(function () {
-            $(this).removeClass('beenRated');
+    function setListeners(){
+        $('.stars').on('mouseover', '.star', function(){
+            var el = $(this);
+            el.addClass('active');
+            el.prevAll('.star').addClass('active');
         });
-        $('.star').each(function (){
+
+        $('.stars').on('mouseout', '.star', function() {
+            var el = $(this);
+            el.removeClass('active');
+            el.prevAll('.star').removeClass('active');
         });
-        el.addClass('beenRated');
-        el.prevAll('.star').addClass('beenRated');
-    });
+
+        $('.stars').on('click', '.star', function(){
+            var el = $(this);
+            $('.beenRated').each(function () {
+                $(this).removeClass('beenRated');
+            });
+            $('.star').each(function (){
+            });
+            el.addClass('beenRated');
+            el.prevAll('.star').addClass('beenRated');
+        });
+    }
 
     $('.cloneBtn').click(function(e){
         e.preventDefault();
@@ -139,12 +206,14 @@ $(function(){
             });
             toLocalStorage.push(storageObj);
             storeItBaby(toLocalStorage);
-            console.log(toLocalStorage);
         }
     });
 
     function storeRanking(div){
-        //console.log(div.find('.beenRated').length);
+        div.removeClass('stars');
+        div.children().each(function() {
+            $(this).addClass('nowRated');
+        })
         div.find('.beenRated').each(function(){
             $(this).addClass('beenRatedRank');
             $(this).removeClass('beenRated');
