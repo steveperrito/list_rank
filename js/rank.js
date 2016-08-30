@@ -6,7 +6,10 @@ $(function(){
 });
 
 $(function(){
+    //listen for ranking...
     setListeners();
+
+    //see if they've ranked anything before
     var getTheStored = JSON.parse(localStorage.getItem('savedList'));
     var toLocalStorage = [];
 
@@ -19,6 +22,7 @@ $(function(){
         toLocalStorage = [];
     }
 
+    //fix for jquery ui sortable problem...
     var fixHelper = function(e, ui) {
         ui.children().each(function() {
             $(this).width($(this).width());
@@ -26,6 +30,7 @@ $(function(){
         return ui;
     };
 
+    //make items sortable (jquery ui)
     $('.appendClone').sortable({
         helper: fixHelper,
         axis: "y",
@@ -33,6 +38,7 @@ $(function(){
         handle: ".glyphicon-sort",
         revert: false,
         tolerance: "pointer",
+        //function to update order of stored items, called after sort
         update: function() {
             var newOrder = [];
             $('tr[data-guid]').each(function(){
@@ -53,9 +59,10 @@ $(function(){
         }
     }).disableSelection();
 
+    //Remove, Mark Complete, Edit Item, & Edit Rank
     $('#items').on('click', function(e){
         var t = e.target;
-        if($(t).hasClass('rmvIt')){
+        if($(t).hasClass('rmvIt')){ //Remove Item
             $(t).closest('tr').fadeOut(500, function(){
                 var thisTR = $(this);
                 toLocalStorage.forEach(function(e){
@@ -70,7 +77,7 @@ $(function(){
                 $(this).remove();
                 if($('.beenRatedRank').length == 0) {$('.table').fadeOut(500)};
             })
-        } else if ($(t).hasClass('glyphicon-ok-circle')){
+        } else if ($(t).hasClass('glyphicon-ok-circle')){ //Mark Complete
             var thisTR = $(t).closest('tr');
             thisTR.toggleClass('chkedOff');
             toLocalStorage.forEach(function(e){
@@ -81,7 +88,7 @@ $(function(){
                     return 0;
                 }
             });
-        } else if ($(t).hasClass('saveList')){
+        } else if ($(t).hasClass('saveList')){ //Edit Item
             var thisTd = $(t).closest('td');
             var thisTR = $(t).closest('tr');
             var itemID = thisTR.attr('data-guid');
@@ -112,7 +119,7 @@ $(function(){
                 thisTd.empty();
                 thisTd.text(newText);
             })
-        } else if ($(t).hasClass('nowRated')){
+        } else if ($(t).hasClass('nowRated')){ //Edit Rating
             var parentDiv = $(t).closest('div');
             parentDiv.addClass('stars');
             parentDiv.find('.beenRatedRank').each(function(){
@@ -124,7 +131,7 @@ $(function(){
                 $(this).removeClass('nowRated');
             });
             setListeners();
-        } else if ($(t).hasClass('wasChanged')){
+        } else if ($(t).hasClass('wasChanged')){ //Finished Rating Edit
             var closestTR = $(t).closest('tr');
             var closestTD = $(t).closest('td');
             var parentDiv = $(t).closest('div');
@@ -176,7 +183,7 @@ $(function(){
         });
     }
 
-    $('.cloneBtn').click(function(e){
+    $('.cloneBtn').click(function(e){ //Rank New Item
         e.preventDefault();
 
         var cloneMe = $('.cloneMeSon:eq(0)');
@@ -185,7 +192,7 @@ $(function(){
         var appendData = cloneMe.clone();
         var listItem = $('.listItem').val(); //Item being Ranked
         var storageID = ID();
-        var storageObj = {
+        var storageObj = { //Obj to be stored
             id: storageID,
             stars: cloneMeRanking.find('.beenRated').length,
             item: listItem,
@@ -209,7 +216,7 @@ $(function(){
         }
     });
 
-    function storeRanking(div){
+    function storeRanking(div){ //Strip Div/Children of classes that trigger listeners and preserve rank
         div.removeClass('stars');
         div.children().each(function() {
             $(this).addClass('nowRated');
@@ -222,15 +229,15 @@ $(function(){
         return div;
     }
 
-    function ID() {
+    function ID() { //Generate unique ID for items
         return '_' + Math.random().toString(36).substr(2, 9);
     };
 
-    function storeItBaby (obj){
+    function storeItBaby (obj){ //Store changes
         localStorage.setItem('savedList', JSON.stringify(obj));
     }
 
-    function buildSavedItems (obj){
+    function buildSavedItems (obj){ //Remember what user left off on.
         var cloneMe = $('.cloneMeSon:eq(0)');
         var cloneMeRanking = $('.stars:eq(0)').clone();
         var appendClone = $('.appendClone');
