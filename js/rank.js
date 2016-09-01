@@ -1,264 +1,335 @@
-
 $(function(){
-    $('.github').click(function(){
-        window.location = 'https://github.com/steveperrito/list_rank';
-    });
-});
+  var tableArea = $('.appendClone');
+  var addToDoButton = $('.save');
+  var sortButton = $('.sort');
+  var savedData = localStorage.getItem('ToDoList');
+  var savedToDos = savedData ? JSON.parse(savedData) : [];
+  var myToDoList = new ToDoList(savedToDos);
 
-$(function(){
-    //listen for ranking...
-    setListeners();
+  writeToDoList(tableArea, myToDoList.render('template'));
 
-    //see if they've ranked anything before
-    var getTheStored = JSON.parse(localStorage.getItem('savedList'));
-    var toLocalStorage = [];
-
-    if (getTheStored != null && getTheStored.length >=1){
-        toLocalStorage = getTheStored;
-        toLocalStorage.forEach(function(obj){
-            buildSavedItems(obj);
-        });
-    } else {
-        toLocalStorage = [];
-    }
-
-    //fix for jquery ui sortable problem...
-    var fixHelper = function(e, ui) {
-        ui.children().each(function() {
-            $(this).width($(this).width());
-        });
-        return ui;
+  //Listen for item add
+  addToDoButton.click(function(e){
+    e.preventDefault();
+    var toDoInput = $('#to-do-item');
+    var toDoItem = toDoInput.val();
+    var rankedClass = $('.beenRated');
+    var itemRank = rankedClass.length;
+    var newToDo = {
+      item : toDoItem,
+      rank : itemRank
     };
 
-    //make items sortable (jquery ui)
-    $('.appendClone').sortable({
-        helper: fixHelper,
-        axis: "y",
-        containment: "parent",
-        handle: ".glyphicon-sort",
-        revert: false,
-        tolerance: "pointer",
-        //function to update order of stored items, called after sort
-        update: function() {
-            var newOrder = [];
-            $('tr[data-guid]').each(function(){
-                var guid = $(this).attr('data-guid');
-                newOrder.push(guid);
-            });
-            newOrder.forEach(function(guid){
-                toLocalStorage.forEach(function(listItem){
-                    if(guid == listItem.id){
-                        listItem.sortOrder = newOrder.indexOf(guid);
-                    }
-                })
-            });
-            toLocalStorage.sort(function(a,b){
-                return a.sortOrder - b.sortOrder;
-            });
-            storeItBaby(toLocalStorage);
-        }
-    }).disableSelection();
-
-    //Remove, Mark Complete, Edit Item, & Edit Rank
-    $('#items').on('click', function(e){
-        var t = e.target;
-        if($(t).hasClass('rmvIt')){ //Remove Item
-            $(t).closest('tr').fadeOut(500, function(){
-                var thisTR = $(this);
-                toLocalStorage.forEach(function(e){
-                    if(thisTR.attr('data-guid') == e.id){
-                        var indexOfAry = toLocalStorage.indexOf(e);
-                        toLocalStorage.splice(indexOfAry, 1);
-                        storeItBaby(toLocalStorage);
-                    } else {
-                        return 0;
-                    }
-                });
-                $(this).remove();
-                if($('.beenRatedRank').length == 0) {$('.table').fadeOut(500)};
-            })
-        } else if ($(t).hasClass('glyphicon-ok-circle')){ //Mark Complete
-            var thisTR = $(t).closest('tr');
-            thisTR.toggleClass('chkedOff');
-            toLocalStorage.forEach(function(e){
-                if(thisTR.attr('data-guid') == e.id){
-                    e.checked = !e.checked;
-                    storeItBaby(toLocalStorage);
-                } else {
-                    return 0;
-                }
-            });
-        } else if ($(t).hasClass('saveList')){ //Edit Item
-            var thisTd = $(t).closest('td');
-            var thisTR = $(t).closest('tr');
-            var itemID = thisTR.attr('data-guid');
-            var indexOfItem;
-            var tdLength = thisTd.width();
-            var frmField = $('<input />', {
-                'class': 'editable',
-                'width': ((tdLength<100)?'100':tdLength)
-            });
-            var originalText = thisTd.text();
-            toLocalStorage.forEach(function(e){
-                if(itemID == e.id){
-                    indexOfItem = toLocalStorage.indexOf(e);
-                }
-            });
-
-            frmField.val(originalText);
-            thisTd.empty();
-            thisTd.append(frmField);
-            frmField.select();
-
-            frmField.on('input', function(){
-                toLocalStorage[indexOfItem].item = $(this).val();
-                storeItBaby(toLocalStorage);
-            });
-            frmField.on('blur', function(){
-                var newText = $(this).val();
-                thisTd.empty();
-                thisTd.text(newText);
-            })
-        } else if ($(t).hasClass('nowRated')){ //Edit Rating
-            var parentDiv = $(t).closest('div');
-            parentDiv.addClass('stars');
-            parentDiv.find('.beenRatedRank').each(function(){
-                $(this).addClass('beenRated');
-                $(this).removeClass('beenRatedRank');
-            });
-            parentDiv.find('.nowRated').each(function(){
-                $(this).addClass('star wasChanged');
-                $(this).removeClass('nowRated');
-            });
-            setListeners();
-        } else if ($(t).hasClass('wasChanged')){ //Finished Rating Edit
-            var closestTR = $(t).closest('tr');
-            var closestTD = $(t).closest('td');
-            var parentDiv = $(t).closest('div');
-            var starRankID = closestTR.attr('data-guid');
-            var indexOfStarRank;
-
-            toLocalStorage.forEach(function(e){
-                if(starRankID == e.id){
-                    indexOfStarRank = toLocalStorage.indexOf(e);
-                }
-            });
-
-            toLocalStorage[indexOfStarRank].stars = parentDiv.find('.beenRated').length;
-            storeItBaby(toLocalStorage);
-
-            parentDiv.find('.wasChanged').each(function(){
-                $(this).removeClass('star wasChanged');
-            });
-            var updatedRank = storeRanking(parentDiv);
-            closestTD.empty();
-            closestTD.append(updatedRank);
-        } else {
-            return 0;
-        }
+    myToDoList.add(newToDo);
+    writeToDoList(tableArea, myToDoList.render('template'), function(){
+      toDoInput.val('');
+      rankedClass.each(function(){
+        $(this).removeClass('beenRated');
+      })
     });
+  });
 
-    function setListeners(){
-        $('.stars').on('mouseover', '.star', function(){
-            var el = $(this);
-            el.addClass('active');
-            el.prevAll('.star').addClass('active');
-        });
-
-        $('.stars').on('mouseout', '.star', function() {
-            var el = $(this);
-            el.removeClass('active');
-            el.prevAll('.star').removeClass('active');
-        });
-
-        $('.stars').on('click', '.star', function(){
-            var el = $(this);
-            $('.beenRated').each(function () {
-                $(this).removeClass('beenRated');
-            });
-            $('.star').each(function (){
-            });
-            el.addClass('beenRated');
-            el.prevAll('.star').addClass('beenRated');
-        });
-    }
-
-    $('.cloneBtn').click(function(e){ //Rank New Item
-        e.preventDefault();
-
-        var cloneMe = $('.cloneMeSon:eq(0)');
-        var cloneMeRanking = $('.stars:eq(0)').clone();// The stars that have been ranked
-        var appendClone = $('.appendClone');
-        var appendData = cloneMe.clone();
-        var listItem = $('.listItem').val(); //Item being Ranked
-        var storageID = ID();
-        var storageObj = { //Obj to be stored
-            id: storageID,
-            stars: cloneMeRanking.find('.beenRated').length,
-            item: listItem,
-            checked: false
-        };
-
-        if (listItem === '' || $('.beenRated').length == 0) {
-            alert('What the hell! Add a list item Or at least Rank it!');
-        } else {
-            $('.table').fadeIn(500);
-            appendData.find('td.saveList').append(listItem);
-            appendData.find('td.saveRank').append(storeRanking(cloneMeRanking));
-            appendData.closest('tr').attr('data-guid',storageID);
-            appendClone.append(appendData);
-            $('.listItem').val('');
-            $('.beenRated').each(function () {
-                $(this).removeClass('beenRated');
-            });
-            toLocalStorage.push(storageObj);
-            storeItBaby(toLocalStorage);
-        }
-    });
-
-    function storeRanking(div){ //Strip Div/Children of classes that trigger listeners and preserve rank
-        div.removeClass('stars');
-        div.children().each(function() {
-            $(this).addClass('nowRated');
-        })
-        div.find('.beenRated').each(function(){
-            $(this).addClass('beenRatedRank');
-            $(this).removeClass('beenRated');
-            $(this).removeClass('active');
-        });
-        return div;
-    }
-
-    function ID() { //Generate unique ID for items
-        return '_' + Math.random().toString(36).substr(2, 9);
+  //Listen for sort
+  sortButton.click(function(){
+    var btn = $(this);
+    var column = btn.attr('data-attr');
+    var currentSortDirection = btn.hasClass('glyphicon-sort-by-attributes') ? 'asc' : 'desc';
+    var nextSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    var icons = {
+      'asc' : 'glyphicon-sort-by-attributes',
+      'desc' : 'glyphicon-sort-by-attributes-alt'
     };
 
-    function storeItBaby (obj){ //Store changes
-        localStorage.setItem('savedList', JSON.stringify(obj));
+    myToDoList.sortBy(column, nextSortDirection);
+    writeToDoList(tableArea, myToDoList.render('template'), function(){
+      btn.removeClass(icons[currentSortDirection]).addClass(icons[nextSortDirection]);
+    });
+
+  });
+
+  //Listen for action buttons
+  tableArea.click(function(e){
+    var action = $(e.target);
+
+    //Delete To-Do.
+    if (action.hasClass('rmvIt')) {
+      var elementToDelte = action.attr('data-item');
+      myToDoList.remove(elementToDelte);
+      writeToDoList(tableArea, myToDoList.render('template'));
     }
 
-    function buildSavedItems (obj){ //Remember what user left off on.
-        var cloneMe = $('.cloneMeSon:eq(0)');
-        var cloneMeRanking = $('.stars:eq(0)').clone();
-        var appendClone = $('.appendClone');
-        var appendData = cloneMe.clone();
-        var listItem = obj.item;
-        var stars = obj.stars;
-        var guid = obj.id;
-        var starsToBeRanked = cloneMeRanking.children();
-
-        $('.table').fadeIn(500);
-        appendData.find('td.saveList').append(listItem);
-        cloneMeRanking.closest('div').removeClass('stars');
-        starsToBeRanked.each(function(){
-            $(this).removeClass('star');
-            $(this).addClass('nowRated');
-        });
-        starsToBeRanked.eq(stars-1).addClass('beenRatedRank');
-        starsToBeRanked.eq(stars-1).prevAll().addClass('beenRatedRank');
-        appendData.find('td.saveRank').append(cloneMeRanking);
-        appendData.closest('tr').attr('data-guid',guid);
-        if(obj.checked == true) appendData.closest('tr').addClass('chkedOff');
-        appendClone.append(appendData);
+    //Mark To-Do Complete
+    if (action.hasClass('glyphicon-ok-circle') && !action.hasClass('text-success')) {
+      var completedToDo = action.attr('data-item');
+      myToDoList.complete(completedToDo);
+      writeToDoList(tableArea, myToDoList.render('template'));
     }
+
+    //Mark To-Do Uncomplete
+    if (action.hasClass('glyphicon-ok-circle') && action.hasClass('text-success')) {
+      var uncompletedToDo = action.attr('data-item');
+      myToDoList.notComplete(uncompletedToDo);
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
+
+    //Make To-Do Editable
+    if (action.hasClass('glyphicon-edit')) {
+      var toDoToEdit = action.attr('data-item');
+      var toDoRow = $('#' + toDoToEdit);
+      writeToDoList(toDoRow, myToDoList.renderEditable('edit-row', toDoToEdit));
+    }
+
+    //Save Edits
+    if (action.hasClass('glyphicon-save')) {
+      var toDoToUpdate = action.attr('data-item');
+      var itemToUpdate = $('#item-' + toDoToUpdate).val();
+      var rankingToUpdate = $('#stars-' + toDoToUpdate).find('.beenRated').length;
+      var allEdits = {
+        'item' : itemToUpdate,
+        'rank' : rankingToUpdate
+      };
+
+      myToDoList.edit(toDoToUpdate, allEdits);
+      writeToDoList(tableArea, myToDoList.render('template'))
+    }
+  });
+
+  /**
+   *
+   * @param container
+   * @param HTML
+   * @param cb
+   */
+  function writeToDoList(container, HTML, cb) {
+    //Populate table or row
+    container
+      .empty()
+      .html(HTML);
+
+    //activate tool-tips
+    $('[data-toggle="tooltip"]').tooltip({
+      template : '<div class="tooltip" role="tooltip"><div class="tooltip-inner"></div></div>',
+      delay: { "show": 1500, "hide": 100 }
+    });
+
+    //Select Ranking Listeners:
+    $('.stars').on('mouseover', '.star', function(){
+      var el = $(this);
+      el.addClass('active');
+      el.prevAll('.star').addClass('active');
+    });
+
+    $('.stars').on('mouseout', '.star', function() {
+      var el = $(this);
+      el.removeClass('active');
+      el.prevAll('.star').removeClass('active');
+    });
+
+    $('.stars').on('click', '.star', function(){
+      var el = $(this);
+      //Clear previous rating.
+      $('.beenRated').each(function(){
+        $(this).removeClass('beenRated');
+      });
+      //Add current rating
+      el.addClass('beenRated').removeClass('active');
+      el.prevAll('.star').addClass('beenRated').removeClass('active');
+    });
+
+    //Callback if provided
+     if (cb) {
+       cb();
+     }
+  }
+
 });
+
+
+/**
+ * Model class handles most data manipulation.
+ * @param {array} toDoItems - objects that represent one to-do item.
+ * @constructor
+ */
+function ToDoList(toDoItems){
+  var That = this;
+
+  this.toDoItems = toDoItems.map(function(el, i, ary){
+    el.UID = That.generateID();
+    return el;
+  });
+}
+
+/**
+ * Generates a unique ID, later used 2-way binding between
+ * Dom and Model.
+ * @returns {string}
+ */
+ToDoList.prototype.generateID = function() {
+  return 'r' + Math.random().toString(36).substr(2, 9);
+};
+
+/**
+ * Returns true if data saved to local storage
+ * Error not handled right now, just thrown.
+ * @returns {boolean}
+ */
+ToDoList.prototype.save = function(){
+  try {
+    localStorage.setItem('ToDoList', JSON.stringify(this.toDoItems));
+  }
+  catch(e){
+    throw e;
+  }
+
+  return true;
+};
+
+/**
+ * Adds to-do item. Saves changes.
+ * @param itemObject
+ * @returns {boolean}
+ */
+ToDoList.prototype.add = function(itemObject) {
+  itemObject.UID = this.generateID();
+  this.toDoItems.push(itemObject);
+
+  return this.save();
+};
+
+
+/**
+ * Deletes to-do item. Saves changes.
+ * @param itemUID
+ * @returns {boolean}
+ */
+ToDoList.prototype.remove = function(itemUID) {
+  this.toDoItems = this.toDoItems.filter(function(el, i, ary){
+    return el.UID !== itemUID;
+  });
+
+  return this.save();
+};
+
+/**
+ * Edits to-do item. Saves changes.
+ * @param itemUID
+ * @param edits
+ * @returns {boolean}
+ */
+ToDoList.prototype.edit = function(itemUID, edits) {
+  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+    if (el.UID === itemUID) {
+      for (var itemProperty in edits) {
+        el[itemProperty] = edits[itemProperty];
+      }
+      return el;
+    }
+    return el;
+  });
+
+  return this.save();
+};
+
+/**
+ * Marks to-do item complete. Saves changes.
+ * @param itemUID
+ * @returns {boolean}
+ */
+ToDoList.prototype.complete = function(itemUID) {
+  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+    if (el.UID == itemUID) {
+      el.completed = true;
+      return el;
+    }
+
+    return el;
+  });
+
+  return this.save();
+};
+
+/**
+ * Marks to-do item incomplete. Saves changes.
+ * @param itemUID
+ * @returns {boolean}
+ */
+ToDoList.prototype.notComplete = function(itemUID) {
+  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+    if (el.UID == itemUID) {
+      delete el.completed;
+      return el;
+    }
+
+    return el;
+  });
+
+  return this.save();
+};
+
+/**
+ * Returns HTML (table rows) with items listed
+ * @param templateID - id of element (selected with jQuery)
+ */
+ToDoList.prototype.render = function(templateID){
+  var template = $('#' + templateID).html();
+  var view = {
+    'items' : this.toDoItems,
+    'ranking' : function() {
+      var stars = '';
+      for (var i = 0;i< this.rank;i++) {
+        stars += '<span class="glyphicon glyphicon-star gold"></span>';
+      }
+
+      return stars;
+    }
+  };
+
+  return Mustache.render(template, view);
+};
+
+/**
+ * Renders HTML for to-do item editing.
+ * @param templateID
+ * @param itemUID
+ */
+ToDoList.prototype.renderEditable = function(templateID, itemUID) {
+  var template = $('#' + templateID).html();
+  var entryToEdit = this.toDoItems.filter(function(el, i, ary){
+    return el.UID == itemUID;
+  });
+  var view = {
+    'items' : entryToEdit
+  };
+
+  return Mustache.render(template, view);
+};
+
+/**
+ * Sorts entire to-do list. Saves changes.
+ * @param attribute - the to-do attribute by which to sort list.
+ * @param order - must be 'asc' or 'desc'
+ * @returns {boolean}
+ */
+ToDoList.prototype.sortBy = function(attribute, order) {
+  if (order == 'asc') {
+    this.toDoItems.sort(function(a,b){
+      /*if(a.completed && b.completed) return 0;
+      if(a.completed && !b.completed) return -1;*/
+      if(a[attribute] < b[attribute]) return -1;
+      if(a[attribute] > b[attribute]) return 1;
+      return 0;
+    });
+  }
+
+  if (order == 'desc') {
+    this.toDoItems.sort(function(a,b){
+      /*if(b.completed) return -1;
+      if(a.completed) return -1;*/
+      if(a[attribute] > b[attribute]) return -1;
+      if(a[attribute] < b[attribute]) return 1;
+      return 0;
+    });
+  }
+
+  return this.save();
+};

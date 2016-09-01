@@ -1,0 +1,22 @@
+{
+  "name": "list_rank",
+  "version": "2.0.0",
+  "description": "'To-Do With Rank'",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/steveperrito/list_rank.git"
+  },
+  "author": "'Steve Perry'",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/steveperrito/list_rank/issues"
+  },
+  "homepage": "https://github.com/steveperrito/list_rank#readme",
+  "dependencies": {
+    "mustache": "^2.2.1"
+  }
+}

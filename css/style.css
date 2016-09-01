@@ -1,78 +1,103 @@
 html {
-    background: #FDFDFD;
+  background: #FDFDFD;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.stars {
-    display: inline-block;
-    margin-left: 10px;
-    cursor: pointer;
+.form-inline .stars {
+  display: inline-block;
+  margin-left: 10px;
+  cursor: pointer;
 }
 
 .active, .beenRated {
-    color: #EFCC00;
+  color: #EFCC00;
 }
 
 .beenRatedRank {
-    color: #EFCC00;
+  color: #EFCC00;
 }
 
 form {
-    width: 600px;
-    margin: inherit;
+  width: 600px;
+  margin: inherit;
 }
 
-.well{
-    background: rgba(204,204,204,.5);
+.well {
+  background: rgba(204, 204, 204, .5);
 }
 
 .cloneBtn {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 span.glyphicon-star {
-    font-size: 1.2em;
+  font-size: 1.2em;
 }
 
-.table {
+/*.table {
     display: none;
-}
+}*/
 
 .rmvIt {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .star {
-    margin-left: -3px;
+  margin-left: -3px;
 }
 
 .glyphicon-sort {
-    cursor: grab;
-    cursor: -webkit-grab;
+  cursor: grab;
+  cursor: -webkit-grab;
 }
 
 .glyphicon-sort:active {
-    cursor: grabbing;
-    cursor: -webkit-grabbing;
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
 }
 
 table tbody tr {
-    background: white;
+  background: white;
 }
 
 .chkedOff {
-    opacity: 0.25;
+  opacity: 0.25;
 }
 
 .nowRated {
-    margin-left: -3px;
-    cursor: default;
+  margin-left: -3px;
+  cursor: default;
 }
 
 .editable {
-    border: 0;
+  border: 0;
 }
+
+.completed .opacity {
+  opacity: 0.5;
+}
+
+.gold {
+  color: #EFCC00;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+/*span.glyphicon {
+  display: inline-block;
+}*/
+
+/*
+.completed td .glyphicon-ok-circle {
+  color:
+}*/

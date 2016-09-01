@@ -1,88 +1,122 @@
 <html>
 <head>
-    <title></title>
-    <link rel="stylesheet" href="css/bootstrap.css"/>
-    <link rel="stylesheet" href="css/style.css"/>
-    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="js/jquery-ui.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>To-Do List with Rank v2</title>
+  <link rel="stylesheet" href="css/bootstrap.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 
 <body>
-    <div class="container-fluid">
-        <nav class="navbar navbar-inverse" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="http://www.github.com/steveperrito">List it 'n rank it!</a>
-            </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                   <li>
-                       <a href="#">
-                           <div class="btn-group">
-                               <button type="button" class="btn btn-primary active btn-xs github">
-                                   <span class="glyphicon glyphicon-thumbs-up"></span> GitHub
-                               </button>
-                           </div>
-                       </a>
-                   </li>
-                </ul>
-            </div>
-        </nav>
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3 well">
-                    <h2>Rank item below</h2>
-                <form action="#" class="form-inline" role="form">
-                    <input class="listItem" type="text"/>
+<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="http://www.github.com/steveperrito">List it 'n rank it!</a>
+  </div>
+  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <ul class="nav navbar-right">
+      <li>
+        <a href="#">
 
-                    <div class="stars">
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                    </div>
-                    <button class="btn btn-primary btn-xs cloneBtn">Rank Item</button>
+            <a href="https://github.com/steveperrito/list_rank" class="btn btn-default btn-xs">
+              <span class="glyphicon glyphicon-thumbs-up"></span> GitHub
+            </a>
 
-                </form>
-            </div>
-        </div>
-        <div style="display: none;">
-            <table>
-                <tbody>
-                <tr class="cloneMeSon">
-                    <td class="saveList"></td>
-                    <td class="saveRank"></td>
-                    <td><span class="glyphicon glyphicon-remove-sign rmvIt"></span></td>
-                    <td><span class="glyphicon glyphicon-ok-circle"></span></td>
-                    <td><span class="glyphicon glyphicon-sort"></span></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-                <table id="items" class="table">
-                    <tr>
-                        <th>Item</th>
-                        <th>Rank</th>
-                        <th>Remove</th>
-                        <th>Mark Complete</th>
-                        <th>Move</th>
-                    </tr>
-                    <tbody class="appendClone">
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3 well">
+      <h2>Create To-Do</h2>
+      <form action="#" class="form-inline" role="form">
+        <input id="to-do-item" class="listItem form-control" type="text" placeholder="Name your to-do">
 
-                    </tbody>
-                </table>
-            </div>
+        <div class="stars">
+          <span class="star glyphicon glyphicon-star"></span>
+          <span class="star glyphicon glyphicon-star"></span>
+          <span class="star glyphicon glyphicon-star"></span>
+          <span class="star glyphicon glyphicon-star"></span>
+          <span class="star glyphicon glyphicon-star"></span>
         </div>
+        <button class="btn btn-primary save">Save</button>
+
+      </form>
     </div>
+  </div>
+  <div class="row">
+    <div id="table-wrap" class="col-md-6 col-md-offset-3">
+      <table id="items" class="table">
+        <tr>
+          <th><span data-attr="item" class="glyphicon glyphicon-sort-by-attributes text-info pointer sort"></span> Item</th>
+          <th><span data-attr="rank" class="glyphicon glyphicon-sort-by-attributes text-info pointer sort"></span> Rank</th>
+          <th></th>
+        </tr>
+        <tbody class="appendClone">
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/rank.js"></script>
+  <!--<div style="display: none;">
+    <table>
+      <tbody>
+      <tr class="cloneMeSon">
+        <td class="saveList"></td>
+        <td class="saveRank"></td>
+        <td><span class="glyphicon glyphicon-remove-sign rmvIt"></span></td>
+        <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+        <td><span class="glyphicon glyphicon-sort"></span></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>-->
+</div>
+
+<script id="template" type="x-tmpl-mustache">
+  {{#items}}
+    <tr id="{{UID}}" class="{{#completed}}completed{{/completed}}">
+       <td class="opacity item {{#completed}}strike{{/completed}}">{{item}}</td>
+       <td class="rank">{{{ranking}}}</td>
+       <td class="text-right">
+         <span data-toggle="tooltip" title="delete" class="glyphicon glyphicon-remove-circle text-danger rmvIt" data-item="{{UID}}"></span> |
+         <span data-toggle="tooltip" title="edit" class="glyphicon glyphicon-edit text-info pointer" data-item="{{UID}}"></span> |
+         <span data-toggle="tooltip" title="mark complete" class="glyphicon glyphicon-ok-circle {{#completed}}text-success{{/completed}} pointer" data-item="{{UID}}"></span>
+       </td>
+     </tr>
+  {{/items}}
+</script>
+
+<script id="edit-row" type="x-tmpl-mustache">
+  {{#items}}
+   <td class="opacity item"><input id="item-{{UID}}" name="item-{{UID}}" value="{{item}}" type="text"></td>
+   <td class="rank">
+     <div id="stars-{{UID}}" class="stars">
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+     </div>
+   </td>
+   <td class="text-right">
+     <span data-toggle="tooltip" title="save edits" class="glyphicon glyphicon-save text-success saveIt pointer" data-item="{{UID}}"></span> |
+     <span data-toggle="tooltip" title="cancel" class="glyphicon glyphicon-remove-circle pointer" data-item="{{UID}}"></span>
+   </td>
+  {{/items}}
+</script>
+
+<script type="text/javascript" src="node_modules/mustache/mustache.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/rank.js"></script>
+
 </body>
 </html>
