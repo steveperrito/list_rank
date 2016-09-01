@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/steveperrito/list_rank#readme",
   "dependencies": {
+    "jquery": "^3.1.0",
     "mustache": "^2.2.1"
   }
 }
