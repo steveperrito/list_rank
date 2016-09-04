@@ -1,14 +1,14 @@
 $(function(){
-  var tableArea = $('.appendClone');
-  var addToDoButton = $('.save');
-  var sortButton = $('.sort');
-  var savedData = localStorage.getItem('ToDoList');
-  var savedToDos = savedData ? JSON.parse(savedData) : [];
-  var myToDoList = new ToDoList(savedToDos);
+  var tableArea = $('.appendClone'),
+    addToDoButton = $('.save'),
+    sortButton = $('.sort'),
+    savedData = localStorage.getItem('ToDoList'),
+    savedToDos = savedData ? JSON.parse(savedData) : [],
+    myToDoList = new ToDoList(savedToDos);
 
   writeToDoList(tableArea, myToDoList.render('template'));
 
-  //Listen for item add
+  //Listen for Item Add
   addToDoButton.click(function(e){
     e.preventDefault();
     var toDoInput = $('#to-do-item');
@@ -29,7 +29,7 @@ $(function(){
     });
   });
 
-  //Listen for sort
+  //Listen for and Handle Column Sorts
   sortButton.click(function(){
     var btn = $(this);
     var column = btn.attr('data-attr');
@@ -42,12 +42,14 @@ $(function(){
 
     myToDoList.sortBy(column, nextSortDirection);
     writeToDoList(tableArea, myToDoList.render('template'), function(){
-      btn.removeClass(icons[currentSortDirection]).addClass(icons[nextSortDirection]);
+      btn
+        .removeClass(icons[currentSortDirection])
+        .addClass(icons[nextSortDirection]);
     });
 
   });
 
-  //Listen for action buttons
+  //Listen for and Handle Action Buttons
   tableArea.click(function(e){
     var action = $(e.target);
 
@@ -65,7 +67,7 @@ $(function(){
       writeToDoList(tableArea, myToDoList.render('template'));
     }
 
-    //Mark To-Do Uncomplete
+    //Mark To-Do Incomplete
     if (action.hasClass('glyphicon-ok-circle') && action.hasClass('text-success')) {
       var uncompletedToDo = action.attr('data-item');
       myToDoList.notComplete(uncompletedToDo);
@@ -92,27 +94,35 @@ $(function(){
       myToDoList.edit(toDoToUpdate, allEdits);
       writeToDoList(tableArea, myToDoList.render('template'))
     }
+
+    //Cancel Editing
+    if (action.hasClass('cancel-edits')) {
+      console.log('has cancel-edits in class')
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
   });
 
   /**
+   * Updates or writes to-do list to dom and sets listeners for
+   * future user interactions. Optional callback provided.
    *
-   * @param container
-   * @param HTML
-   * @param cb
+   * @param container - HTML table body to which HTML is appended
+   * @param HTML - Table rows in html.
+   * @param cb - Optional Callback function.
    */
   function writeToDoList(container, HTML, cb) {
-    //Populate table or row
+    //Populate Table or Row
     container
       .empty()
       .html(HTML);
 
-    //activate tool-tips
+    //Activate Tool-tips
     $('[data-toggle="tooltip"]').tooltip({
       template : '<div class="tooltip" role="tooltip"><div class="tooltip-inner"></div></div>',
-      delay: { "show": 1500, "hide": 100 }
+      delay: { "show": 1000, "hide": 100 }
     });
 
-    //Select Ranking Listeners:
+    //Set 'Select Ranking' Listeners:
     $('.stars').on('mouseover', '.star', function(){
       var el = $(this);
       el.addClass('active');
@@ -147,6 +157,7 @@ $(function(){
 
 /**
  * Model class handles most data manipulation.
+ *
  * @param {array} toDoItems - objects that represent one to-do item.
  * @constructor
  */
@@ -162,6 +173,7 @@ function ToDoList(toDoItems){
 /**
  * Generates a unique ID, later used 2-way binding between
  * Dom and Model.
+ *
  * @returns {string}
  */
 ToDoList.prototype.generateID = function() {
@@ -171,6 +183,7 @@ ToDoList.prototype.generateID = function() {
 /**
  * Returns true if data saved to local storage
  * Error not handled right now, just thrown.
+ *
  * @returns {boolean}
  */
 ToDoList.prototype.save = function(){
@@ -186,6 +199,7 @@ ToDoList.prototype.save = function(){
 
 /**
  * Adds to-do item. Saves changes.
+ *
  * @param itemObject
  * @returns {boolean}
  */
@@ -193,12 +207,13 @@ ToDoList.prototype.add = function(itemObject) {
   itemObject.UID = this.generateID();
   this.toDoItems.push(itemObject);
 
-  return this.save();
+  return this.sortBy(null, 'markedDone');
 };
 
 
 /**
  * Deletes to-do item. Saves changes.
+ *
  * @param itemUID
  * @returns {boolean}
  */
@@ -207,11 +222,12 @@ ToDoList.prototype.remove = function(itemUID) {
     return el.UID !== itemUID;
   });
 
-  return this.save();
+  return this.sortBy(null, 'markedDone');
 };
 
 /**
  * Edits to-do item. Saves changes.
+ *
  * @param itemUID
  * @param edits
  * @returns {boolean}
@@ -232,6 +248,7 @@ ToDoList.prototype.edit = function(itemUID, edits) {
 
 /**
  * Marks to-do item complete. Saves changes.
+ *
  * @param itemUID
  * @returns {boolean}
  */
@@ -245,11 +262,12 @@ ToDoList.prototype.complete = function(itemUID) {
     return el;
   });
 
-  return this.save();
+  return this.sortBy(null, 'markedDone');
 };
 
 /**
  * Marks to-do item incomplete. Saves changes.
+ *
  * @param itemUID
  * @returns {boolean}
  */
@@ -263,11 +281,12 @@ ToDoList.prototype.notComplete = function(itemUID) {
     return el;
   });
 
-  return this.save();
+  return this.sortBy(null, 'markedDone');
 };
 
 /**
  * Returns HTML (table rows) with items listed
+ *
  * @param templateID - id of element (selected with jQuery)
  */
 ToDoList.prototype.render = function(templateID){
@@ -289,6 +308,7 @@ ToDoList.prototype.render = function(templateID){
 
 /**
  * Renders HTML for to-do item editing.
+ *
  * @param templateID
  * @param itemUID
  */
@@ -306,30 +326,82 @@ ToDoList.prototype.renderEditable = function(templateID, itemUID) {
 
 /**
  * Sorts entire to-do list. Saves changes.
+ *
+ * 'markedDone' settings sorts completed items ONLY to bottom of list.
+ * 'asc' or 'desc' sorts first based on completed status, then by
+ * ascending or descending order.
+ *
  * @param attribute - the to-do attribute by which to sort list.
- * @param order - must be 'asc' or 'desc'
+ * @param order - must be 'asc', 'desc', or 'markedDone'
  * @returns {boolean}
  */
 ToDoList.prototype.sortBy = function(attribute, order) {
   if (order == 'asc') {
     this.toDoItems.sort(function(a,b){
-      /*if(a.completed && b.completed) return 0;
-      if(a.completed && !b.completed) return -1;*/
-      if(a[attribute] < b[attribute]) return -1;
-      if(a[attribute] > b[attribute]) return 1;
-      return 0;
+      if (!a.completed && !b.completed) {
+        if(a[attribute] < b[attribute]) return -1;
+        if(a[attribute] > b[attribute]) return 1;
+        return 0;
+      }
+
+      if(a.completed && !b.completed) {
+        return 1;
+      }
+
+      return -1;
+
     });
   }
 
   if (order == 'desc') {
     this.toDoItems.sort(function(a,b){
-      /*if(b.completed) return -1;
-      if(a.completed) return -1;*/
-      if(a[attribute] > b[attribute]) return -1;
-      if(a[attribute] < b[attribute]) return 1;
+      if (!a.completed && !b.completed) {
+        if(a[attribute] > b[attribute]) return -1;
+        if(a[attribute] < b[attribute]) return 1;
+        return 0;
+      }
+
+      if(a.completed && !b.completed) {
+        return 1;
+      }
+
+      return -1;
+    });
+  }
+
+  if (order == 'markedDone') {
+    this.toDoItems.sort(function(a,b){
+      if(a.completed && !b.completed) return 1;
+      if(!a.completed && b.completed) return -1;
       return 0;
     });
   }
 
+  this.markFirstCompleted();
   return this.save();
+};
+
+/**
+ * Marks the first completed item so that template renders a title
+ * above all completed items.
+ *
+ * This only works if you are sorting completed items to the
+ * bottom of the list.
+ */
+ToDoList.prototype.markFirstCompleted = function() {
+  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+    if (el.firstCompletedItem) {
+      delete el.firstCompletedItem;
+      return el
+    }
+
+    return el;
+  });
+
+  for (var i = 0; i<this.toDoItems.length; i++) {
+    if (this.toDoItems[i].completed) {
+      this.toDoItems[i].firstCompletedItem = true;
+      break;
+    }
+  }
 };

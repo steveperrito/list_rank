@@ -1,5 +1,6 @@
-html {
+html, body {
   background: #FDFDFD;
+  font-size: large;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -8,8 +9,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .form-inline .stars {
+  line-height: 1;
   display: inline-block;
-  margin-left: 10px;
+  margin: 0 10px;
   cursor: pointer;
 }
 
@@ -21,9 +23,18 @@ h1, h2, h3, h4, h5, h6 {
   color: #EFCC00;
 }
 
-form {
-  width: 600px;
-  margin: inherit;
+#create-to-do {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+@media (min-width: 414px) {
+  #create-to-do {
+    /*font-size: medium;*/
+    flex-direction: row;
+  }
 }
 
 .well {
@@ -38,9 +49,16 @@ span.glyphicon-star {
   font-size: 1.2em;
 }
 
-/*.table {
-    display: none;
-}*/
+.table {
+  font-size: large;
+}
+
+.form-control {
+  font-size: large;
+  display: inline-block;
+  width: auto;
+  height: auto;
+}
 
 .rmvIt {
   cursor: pointer;
@@ -85,12 +103,23 @@ table tbody tr {
   color: #EFCC00;
 }
 
+.completed .gold {
+  color: #d7b700;
+}
+
 .pointer {
   cursor: pointer;
 }
 
 .strike {
   text-decoration: line-through;
+}
+
+.table>tbody>tr>td.completed-mark {
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  border: none;
 }
 
 /*span.glyphicon {
