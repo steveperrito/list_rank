@@ -1,7 +1,7 @@
 $(function(){
   var tableArea = $('.appendClone'),
     addToDoButton = $('.save'),
-    sortButton = $('.sort'),
+    sortButtons = $('.sort'),
     savedData = localStorage.getItem('ToDoList'),
     savedToDos = savedData ? JSON.parse(savedData) : [],
     myToDoList = new ToDoList(savedToDos);
@@ -20,7 +20,11 @@ $(function(){
       rank : itemRank
     };
 
-    myToDoList.add(newToDo);
+    myToDoList
+      .add(newToDo)
+      .sortBy(null, 'markedDone')
+      .save();
+
     writeToDoList(tableArea, myToDoList.render('template'), function(){
       toDoInput.val('');
       rankedClass.each(function(){
@@ -30,7 +34,7 @@ $(function(){
   });
 
   //Listen for and Handle Column Sorts
-  sortButton.click(function(){
+  sortButtons.click(function(){
     var btn = $(this);
     var column = btn.attr('data-attr');
     var currentSortDirection = btn.hasClass('glyphicon-sort-by-attributes') ? 'asc' : 'desc';
@@ -40,7 +44,10 @@ $(function(){
       'desc' : 'glyphicon-sort-by-attributes-alt'
     };
 
-    myToDoList.sortBy(column, nextSortDirection);
+    myToDoList
+      .sortBy(column, nextSortDirection)
+      .save();
+
     writeToDoList(tableArea, myToDoList.render('template'), function(){
       btn
         .removeClass(icons[currentSortDirection])
@@ -55,22 +62,33 @@ $(function(){
 
     //Delete To-Do.
     if (action.hasClass('rmvIt')) {
-      var elementToDelte = action.attr('data-item');
-      myToDoList.remove(elementToDelte);
+      var elementToDelete = action.attr('data-item');
+      myToDoList
+        .remove(elementToDelete)
+        .save();
+
       writeToDoList(tableArea, myToDoList.render('template'));
     }
 
     //Mark To-Do Complete
     if (action.hasClass('glyphicon-ok-circle') && !action.hasClass('text-success')) {
       var completedToDo = action.attr('data-item');
-      myToDoList.complete(completedToDo);
+      myToDoList
+        .complete(completedToDo)
+        .sortBy(null, 'markedDone')
+        .save();
+
       writeToDoList(tableArea, myToDoList.render('template'));
     }
 
     //Mark To-Do Incomplete
     if (action.hasClass('glyphicon-ok-circle') && action.hasClass('text-success')) {
       var uncompletedToDo = action.attr('data-item');
-      myToDoList.notComplete(uncompletedToDo);
+      myToDoList
+        .notComplete(uncompletedToDo)
+        .sortBy(null, 'markedDone')
+        .save();
+
       writeToDoList(tableArea, myToDoList.render('template'));
     }
 
@@ -78,6 +96,7 @@ $(function(){
     if (action.hasClass('glyphicon-edit')) {
       var toDoToEdit = action.attr('data-item');
       var toDoRow = $('#' + toDoToEdit);
+
       writeToDoList(toDoRow, myToDoList.renderEditable('edit-row', toDoToEdit));
     }
 
@@ -91,13 +110,15 @@ $(function(){
         'rank' : rankingToUpdate
       };
 
-      myToDoList.edit(toDoToUpdate, allEdits);
+      myToDoList
+        .edit(toDoToUpdate, allEdits)
+        .save();
+
       writeToDoList(tableArea, myToDoList.render('template'))
     }
 
     //Cancel Editing
     if (action.hasClass('cancel-edits')) {
-      console.log('has cancel-edits in class')
       writeToDoList(tableArea, myToDoList.render('template'));
     }
   });
@@ -106,9 +127,9 @@ $(function(){
    * Updates or writes to-do list to dom and sets listeners for
    * future user interactions. Optional callback provided.
    *
-   * @param container - HTML table body to which HTML is appended
-   * @param HTML - Table rows in html.
-   * @param cb - Optional Callback function.
+   * @param container {jQuery} - HTML table body to which HTML is appended
+   * @param HTML {String} - Table rows in html.
+   * @param cb [Function] - Optional Callback function.
    */
   function writeToDoList(container, HTML, cb) {
     //Populate Table or Row
@@ -117,25 +138,38 @@ $(function(){
       .html(HTML);
 
     //Activate Tool-tips
-    $('[data-toggle="tooltip"]').tooltip({
-      template : '<div class="tooltip" role="tooltip"><div class="tooltip-inner"></div></div>',
-      delay: { "show": 1000, "hide": 100 }
-    });
+    activateToolTips($('[data-toggle="tooltip"]'));
 
+    //Set listeners for rankings
+    listenForRank($('.stars'));
+
+    //Callback (if provided)
+     if (cb) {
+       cb();
+     }
+  }
+
+  /**
+   * Listens for ranking events. Can be called
+   * multiple times for new Dom content.
+   *
+   * @param starWrapper {jQuery}
+   */
+  function listenForRank(starWrapper) {
     //Set 'Select Ranking' Listeners:
-    $('.stars').on('mouseover', '.star', function(){
+    starWrapper.on('mouseover', '.star', function(){
       var el = $(this);
       el.addClass('active');
       el.prevAll('.star').addClass('active');
     });
 
-    $('.stars').on('mouseout', '.star', function() {
+    starWrapper.on('mouseout', '.star', function() {
       var el = $(this);
       el.removeClass('active');
       el.prevAll('.star').removeClass('active');
     });
 
-    $('.stars').on('click', '.star', function(){
+    starWrapper.on('click', '.star', function(){
       var el = $(this);
       //Clear previous rating.
       $('.beenRated').each(function(){
@@ -145,11 +179,21 @@ $(function(){
       el.addClass('beenRated').removeClass('active');
       el.prevAll('.star').addClass('beenRated').removeClass('active');
     });
+  }
 
-    //Callback if provided
-     if (cb) {
-       cb();
-     }
+  /**
+   * Activates Bootstrap's tooltips. Can be called
+   * multiple times for new Dom content.
+   *
+   * @param toolTips {jQuery}
+   */
+  function activateToolTips(toolTips) {
+    /*$('[data-toggle="tooltip"]')*/
+
+    toolTips.tooltip({
+      template : '<div class="tooltip" role="tooltip"><div class="tooltip-inner"></div></div>',
+      delay: { "show": 1000, "hide": 100 }
+    });
   }
 
 });
@@ -158,23 +202,23 @@ $(function(){
 /**
  * Model class handles most data manipulation.
  *
- * @param {array} toDoItems - objects that represent one to-do item.
+ * @param {Array} toDoItems - objects that represent one to-do item.
  * @constructor
  */
 function ToDoList(toDoItems){
   var That = this;
 
-  this.toDoItems = toDoItems.map(function(el, i, ary){
+  this.toDoItems = toDoItems.map(function(el){
     el.UID = That.generateID();
     return el;
   });
 }
 
 /**
- * Generates a unique ID, later used 2-way binding between
- * Dom and Model.
+ * Generates a unique ID, later used for 2-way binding
+ * between Dom and Model.
  *
- * @returns {string}
+ * @returns {String}
  */
 ToDoList.prototype.generateID = function() {
   return 'r' + Math.random().toString(36).substr(2, 9);
@@ -182,9 +226,8 @@ ToDoList.prototype.generateID = function() {
 
 /**
  * Returns true if data saved to local storage
- * Error not handled right now, just thrown.
  *
- * @returns {boolean}
+ * @returns {Boolean}
  */
 ToDoList.prototype.save = function(){
   try {
@@ -198,42 +241,42 @@ ToDoList.prototype.save = function(){
 };
 
 /**
- * Adds to-do item. Saves changes.
+ * Adds to-do item.
  *
- * @param itemObject
- * @returns {boolean}
+ * @param itemObject {Object}
+ * @returns {ToDoList}
  */
 ToDoList.prototype.add = function(itemObject) {
   itemObject.UID = this.generateID();
   this.toDoItems.push(itemObject);
 
-  return this.sortBy(null, 'markedDone');
+  return this;
 };
 
 
 /**
- * Deletes to-do item. Saves changes.
+ * Deletes to-do item.
  *
- * @param itemUID
- * @returns {boolean}
+ * @param itemUID {String}
+ * @returns {ToDoList}
  */
 ToDoList.prototype.remove = function(itemUID) {
-  this.toDoItems = this.toDoItems.filter(function(el, i, ary){
+  this.toDoItems = this.toDoItems.filter(function(el){
     return el.UID !== itemUID;
   });
 
-  return this.sortBy(null, 'markedDone');
+  return this;
 };
 
 /**
- * Edits to-do item. Saves changes.
+ * Edits to-do item.
  *
- * @param itemUID
- * @param edits
- * @returns {boolean}
+ * @param itemUID {String}
+ * @param edits {Object}
+ * @returns {ToDoList}
  */
 ToDoList.prototype.edit = function(itemUID, edits) {
-  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+  this.toDoItems = this.toDoItems.map(function(el){
     if (el.UID === itemUID) {
       for (var itemProperty in edits) {
         el[itemProperty] = edits[itemProperty];
@@ -243,17 +286,17 @@ ToDoList.prototype.edit = function(itemUID, edits) {
     return el;
   });
 
-  return this.save();
+  return this;
 };
 
 /**
- * Marks to-do item complete. Saves changes.
+ * Marks to-do item complete.
  *
- * @param itemUID
- * @returns {boolean}
+ * @param itemUID {String}
+ * @returns {ToDoList}
  */
 ToDoList.prototype.complete = function(itemUID) {
-  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+  this.toDoItems = this.toDoItems.map(function(el){
     if (el.UID == itemUID) {
       el.completed = true;
       return el;
@@ -262,17 +305,17 @@ ToDoList.prototype.complete = function(itemUID) {
     return el;
   });
 
-  return this.sortBy(null, 'markedDone');
+  return this;
 };
 
 /**
- * Marks to-do item incomplete. Saves changes.
+ * Marks to-do item incomplete.
  *
- * @param itemUID
- * @returns {boolean}
+ * @param itemUID {String}
+ * @returns {ToDoList}
  */
 ToDoList.prototype.notComplete = function(itemUID) {
-  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+  this.toDoItems = this.toDoItems.map(function(el){
     if (el.UID == itemUID) {
       delete el.completed;
       return el;
@@ -281,13 +324,14 @@ ToDoList.prototype.notComplete = function(itemUID) {
     return el;
   });
 
-  return this.sortBy(null, 'markedDone');
+  return this;
 };
 
 /**
  * Returns HTML (table rows) with items listed
  *
- * @param templateID - id of element (selected with jQuery)
+ * @param templateID {String} - id of element (selected
+ * with jQuery)
  */
 ToDoList.prototype.render = function(templateID){
   var template = $('#' + templateID).html();
@@ -314,7 +358,7 @@ ToDoList.prototype.render = function(templateID){
  */
 ToDoList.prototype.renderEditable = function(templateID, itemUID) {
   var template = $('#' + templateID).html();
-  var entryToEdit = this.toDoItems.filter(function(el, i, ary){
+  var entryToEdit = this.toDoItems.filter(function(el){
     return el.UID == itemUID;
   });
   var view = {
@@ -333,7 +377,7 @@ ToDoList.prototype.renderEditable = function(templateID, itemUID) {
  *
  * @param attribute - the to-do attribute by which to sort list.
  * @param order - must be 'asc', 'desc', or 'markedDone'
- * @returns {boolean}
+ * @returns {ToDoList}
  */
 ToDoList.prototype.sortBy = function(attribute, order) {
   if (order == 'asc') {
@@ -378,7 +422,7 @@ ToDoList.prototype.sortBy = function(attribute, order) {
   }
 
   this.markFirstCompleted();
-  return this.save();
+  return this;
 };
 
 /**
@@ -389,7 +433,7 @@ ToDoList.prototype.sortBy = function(attribute, order) {
  * bottom of the list.
  */
 ToDoList.prototype.markFirstCompleted = function() {
-  this.toDoItems = this.toDoItems.map(function(el, i, ary){
+  this.toDoItems = this.toDoItems.map(function(el){
     if (el.firstCompletedItem) {
       delete el.firstCompletedItem;
       return el
