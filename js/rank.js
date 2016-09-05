@@ -22,7 +22,7 @@ $(function(){
 
     myToDoList
       .add(newToDo)
-      .sortBy(null, 'markedDone')
+      .sortByStatus()
       .save();
 
     writeToDoList(tableArea, myToDoList.render('template'), function(){
@@ -46,6 +46,7 @@ $(function(){
 
     myToDoList
       .sortBy(column, nextSortDirection)
+      .sortByStatus()
       .save();
 
     writeToDoList(tableArea, myToDoList.render('template'), function(){
@@ -75,7 +76,7 @@ $(function(){
       var completedToDo = action.attr('data-item');
       myToDoList
         .complete(completedToDo)
-        .sortBy(null, 'markedDone')
+        .sortByStatus()
         .save();
 
       writeToDoList(tableArea, myToDoList.render('template'));
@@ -86,7 +87,7 @@ $(function(){
       var uncompletedToDo = action.attr('data-item');
       myToDoList
         .notComplete(uncompletedToDo)
-        .sortBy(null, 'markedDone')
+        .sortByStatus()
         .save();
 
       writeToDoList(tableArea, myToDoList.render('template'));
@@ -369,59 +370,48 @@ ToDoList.prototype.renderEditable = function(templateID, itemUID) {
 };
 
 /**
- * Sorts entire to-do list. Saves changes.
+ * Sorts list by columns (rank or to-do item).
+ * order can be ascending ('asc') or descending
+ * ('desc')
  *
- * 'markedDone' settings sorts completed items ONLY to bottom of list.
- * 'asc' or 'desc' sorts first based on completed status, then by
- * ascending or descending order.
- *
- * @param attribute - the to-do attribute by which to sort list.
- * @param order - must be 'asc', 'desc', or 'markedDone'
+ * @param attribute {String} - can be 'rank' or 'item'
+ * @param order {String} -  can be 'asc' or 'desc'
  * @returns {ToDoList}
  */
 ToDoList.prototype.sortBy = function(attribute, order) {
   if (order == 'asc') {
     this.toDoItems.sort(function(a,b){
-      if (!a.completed && !b.completed) {
-        if(a[attribute] < b[attribute]) return -1;
-        if(a[attribute] > b[attribute]) return 1;
-        return 0;
-      }
-
-      if(a.completed && !b.completed) {
-        return 1;
-      }
-
-      return -1;
-
+      if(a[attribute] < b[attribute]) return -1;
+      if(a[attribute] > b[attribute]) return 1;
+      return 0;
     });
   }
 
   if (order == 'desc') {
     this.toDoItems.sort(function(a,b){
-      if (!a.completed && !b.completed) {
-        if(a[attribute] > b[attribute]) return -1;
-        if(a[attribute] < b[attribute]) return 1;
-        return 0;
-      }
-
-      if(a.completed && !b.completed) {
-        return 1;
-      }
-
-      return -1;
-    });
-  }
-
-  if (order == 'markedDone') {
-    this.toDoItems.sort(function(a,b){
-      if(a.completed && !b.completed) return 1;
-      if(!a.completed && b.completed) return -1;
+      if(a[attribute] > b[attribute]) return -1;
+      if(a[attribute] < b[attribute]) return 1;
       return 0;
     });
   }
 
+  return this;
+};
+
+/**
+ * Sorts list by each item's completed status.
+ * Completed items go to the bottom.
+ * 
+ * @returns {ToDoList}
+ */
+ToDoList.prototype.sortByStatus = function() {
+  this.toDoItems.sort(function(a,b) {
+    if (a.completed && !b.completed) return 1;
+    if (!a.completed && b.completed) return -1;
+    return 0;
+  });
   this.markFirstCompleted();
+
   return this;
 };
 
