@@ -217,8 +217,7 @@ $(function(){
     };
 
     myToDoList
-      .sortBy(column, nextSortDirection)
-      .sortByStatus()
+      .sortIncompleteBy(column, nextSortDirection)
       .markFirstCompleted()
       .save();
 

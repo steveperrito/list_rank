@@ -213,6 +213,48 @@ ToDoList.prototype.sortByStatus = function() {
 };
 
 /**
+ * Sorts list first by completed status, then by column
+ * attribute in 'asc' or 'desc' order.
+ *
+ * @param attribute {String} - 'item' or 'rank'
+ * @param order {String} - 'asc' or 'desc'
+ * @returns {ToDoList}
+ */
+ToDoList.prototype.sortIncompleteBy = function(attribute, order) {
+  if (order == 'asc') {
+    this.toDoItems.sort(function(a,b){
+      if ((a.completed && b.completed) || (!a.completed && !b.completed)) {
+        if(a[attribute] < b[attribute]) return -1;
+        if(a[attribute] > b[attribute]) return 1;
+        return 0;
+      }
+      if (!a.completed && b.completed) {
+        return -1;
+      }
+
+      return 1;
+    });
+  }
+
+  if (order == 'desc') {
+    this.toDoItems.sort(function(a,b){
+      if ((a.completed && b.completed) || (!a.completed && !b.completed)) {
+        if (a[attribute] > b[attribute]) return -1;
+        if (a[attribute] < b[attribute]) return 1;
+        return 0;
+      }
+      if (!a.completed && b.completed) {
+        return -1;
+      }
+
+      return 1;
+    });
+  }
+
+  return this;
+};
+
+/**
  * Marks the first completed item so that template renders a title
  * above all completed items.
  *
