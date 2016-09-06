@@ -44,6 +44,8 @@ $(function(){
       var elementToDelete = action.attr('data-item');
       myToDoList
         .remove(elementToDelete)
+        .sortByStatus()
+        .markFirstCompleted()
         .save();
 
       writeToDoList(tableArea, myToDoList.render('template'));
