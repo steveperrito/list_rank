@@ -4,14 +4,70 @@ $(function(){
     sortButtons = $('.sort'),
     savedData = localStorage.getItem('ToDoList'),
     savedToDos = savedData ? JSON.parse(savedData) : [],
-    myToDoList = new ToDoList(savedToDos);
+    myToDoList = new ToDoList(savedToDos),
+    toDoInput = $('#to-do-item'),
+    toggleVisibility = $('.visibility-toggle');
 
   writeToDoList(tableArea, myToDoList.render('template'));
+
+  //Fade in add-to-do controls
+  toDoInput.on('input', function(){
+    if (!$(this).val()) {
+
+      //stop function if to items are listed.
+      if(myToDoList.toDoItems.length > 0) return;
+
+      //otherwise hide visible elements since input val is falsy
+      toggleVisibility.each(function () {
+        if (!$(this).hasClass('not-visible')) {
+          $(this).addClass('not-visible');
+        }
+      })
+    }
+    //Since input val is truthy, make sure elements are visible.
+    else {
+      toggleVisibility.each(function () {
+        if ($(this).hasClass('not-visible')) {
+          $(this).removeClass('not-visible');
+        }
+      });
+    }
+  });
+
+  //Make rows sortable
+  tableArea.sortable({
+    handle: '.handle',
+    axis:'y',
+    helper: function(e, tr)
+    {
+      var $originals = tr.children();
+      var $helper = tr.clone();
+      /*console.log($helper.children().length);*/
+      $helper.children().each(function(index)
+      {
+        // Set helper cell sizes to match the original sizes
+        console.log($originals.eq(index).outerWidth());
+        $(this).width($originals.eq(index).outerWidth());
+      });
+      return $helper;
+    },
+    stop: function (e, tr) {
+      var sortOrder = [];
+      tableArea.find('tr').each(function(){
+        var thisUID = $(this).attr('id');
+        sortOrder.push(thisUID);
+      });
+
+      /*console.log(sortOrder);*/
+      myToDoList.sortByUID(sortOrder);
+
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
+  });
 
   //Listen for Item Add
   addToDoButton.click(function(e){
     e.preventDefault();
-    var toDoInput = $('#to-do-item');
     var toDoItem = toDoInput.val();
     var rankedClass = $('.beenRated');
     var itemRank = rankedClass.length;
@@ -125,6 +181,25 @@ $(function(){
 
     //Set listeners for rankings
     listenForRank($('.stars'));
+
+    //Fade in add-to-do controls if needed
+    if (myToDoList.toDoItems.length > 0) {
+      toggleVisibility
+        .each(function () {
+          if ($(this).hasClass('not-visible')) {
+            $(this).removeClass('not-visible');
+          }
+        });
+    }
+
+    else {
+      toggleVisibility
+        .each(function () {
+          if(!$(this).hasClass('not-visible')) {
+            $(this).addClass('not-visible');
+          }
+        })
+    }
 
     //Callback (if provided)
      if (cb) {

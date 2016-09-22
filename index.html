@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>To-Do List with Rank v2</title>
@@ -9,51 +9,52 @@
 <body>
 <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
   <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a class="navbar-brand" href="http://www.github.com/steveperrito">List it 'n rank it!</a>
+    <a class="navbar-brand" href="http://www.github.com/steveperrito" target="_blank">
+      <img id="gh-img" src="http://steveperrito.github.io/img/GitHub-Mark-120px-plus.png" alt="github" height="25">
+    </a>
+    <a href="http://www.linkedin.com/in/steveperry33" class="navbar-brand border-left border-right" target="_blank">
+      <img src="http://steveperrito.github.io/img/LinkedIn-InBug-2C.png" alt="linkedin" height="25">
+    </a>
+    <a href="http://stackoverflow.com/users/3990308/steve-perry" class="navbar-brand" target="_blank">
+      <img src="img/so-icon.png" alt="stackoverflow" height="25">
+    </a>
   </div>
-  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-    <ul class="nav navbar-right">
-      <li>
-        <a href="#">
-
-            <a href="https://github.com/steveperrito/list_rank" class="btn btn-default">
-              <span class="glyphicon glyphicon-thumbs-up"></span> GitHub
-            </a>
-
-        </a>
-      </li>
-    </ul>
-  </div>
+  <!--<a class="pull-right" href="https://github.com/steveperrito/list_rank">
+    <span class="glyphicon glyphicon-thumbs-up"></span> GitHub
+  </a>-->
 </nav>
 <div class="container-fluid">
   <div class="row">
-    <div class="col-lg-8 col-lg-offset-2 well text-center">
-      <h2>Add A To-Do</h2>
-      <form id="create-to-do" action="#" class="form-inline" role="form">
-        <input id="to-do-item" class="listItem form-control" type="text" placeholder="Name your to-do">
+    <div class="col-lg-8 col-lg-offset-2">
+      <div class="well text-center">
+        <!--<h2>Add A To-Do</h2>-->
+        <form id="create-to-do" action="#" class="form-inline" role="form">
+          <input autofocus id="to-do-item" class="listItem form-control fontAwesome" type="text" placeholder="&#x270f; add a task">
 
-        <div class="stars">
-          <span class="star glyphicon glyphicon-star"></span>
-          <span class="star glyphicon glyphicon-star"></span>
-          <span class="star glyphicon glyphicon-star"></span>
-          <span class="star glyphicon glyphicon-star"></span>
-          <span class="star glyphicon glyphicon-star"></span>
-        </div>
-        <button class="btn btn-primary btn-lg save">Add</button>
+          <div class="stars visibility-toggle not-visible">
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+          </div>
+          <button class="btn btn-primary btn-lg save visibility-toggle not-visible">Add</button>
 
-      </form>
+        </form>
+      </div>
     </div>
   </div>
   <div class="row">
     <div id="table-wrap" class="col-lg-8 col-lg-offset-2">
-      <table id="items" class="table">
+      <table id="items" class="table visibility-toggle not-visible">
+        <colgroup>
+          <col style="width:30px;">
+          <col>
+          <col style="width:130px;">
+          <col style="width:130px;">
+        </colgroup>
         <tr>
+          <th></th>
           <th><span data-attr="item" class="glyphicon glyphicon-sort-by-attributes text-info pointer sort"></span> Item</th>
           <th><span data-attr="rank" class="glyphicon glyphicon-sort-by-attributes text-info pointer sort"></span> Rank</th>
           <th></th>
@@ -83,16 +84,19 @@
   {{#items}}
     {{#firstCompletedItem}}
       <tr>
-        <td class="completed-mark text-center well well-sm" colspan="3">Finished Tasks</td>
+        <td class="completed-mark text-center well well-sm" colspan="4">Finished Tasks</td>
       </tr>
     {{/firstCompletedItem}}
     <tr id="{{UID}}" class="{{#completed}}completed{{/completed}}">
+       <td class="handle text-sm align-middle"><span class="glyphicon glyphicon-th grab"></span></td>
        <td class="opacity item {{#completed}}strike{{/completed}}">{{item}}</td>
        <td class="rank">{{{ranking}}}</td>
        <td class="text-right">
-         <span data-toggle="tooltip" title="delete" class="glyphicon glyphicon-remove-circle text-danger rmvIt" data-item="{{UID}}"></span> |
+         <div class="action-btns">
+          <span data-toggle="tooltip" title="delete" class="glyphicon glyphicon-remove-circle text-danger rmvIt" data-item="{{UID}}"></span> |
          <span data-toggle="tooltip" title="edit" class="glyphicon glyphicon-edit text-info pointer" data-item="{{UID}}"></span> |
          <span data-toggle="tooltip" title="mark {{^completed}}complete{{/completed}}{{#completed}}incomplete{{/completed}}" class="glyphicon glyphicon-ok-circle {{#completed}}text-success{{/completed}} pointer" data-item="{{UID}}"></span>
+         </div>
        </td>
      </tr>
   {{/items}}
@@ -100,6 +104,7 @@
 
 <script id="edit-row" type="x-tmpl-mustache">
   {{#items}}
+  <td></td>
    <td class="opacity item"><input id="item-{{UID}}" name="item-{{UID}}" value="{{item}}" type="text"></td>
    <td class="rank">
      <div id="stars-{{UID}}" class="stars">

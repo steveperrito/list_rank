@@ -47,7 +47,7 @@ ToDoList.prototype.save = function(){
  */
 ToDoList.prototype.add = function(itemObject) {
   itemObject.UID = this.generateID();
-  this.toDoItems.push(itemObject);
+  this.toDoItems.unshift(itemObject);
 
   return this;
 };
@@ -250,6 +250,28 @@ ToDoList.prototype.sortIncompleteBy = function(attribute, order) {
       return 1;
     });
   }
+
+  return this;
+};
+
+/**
+ *
+ * @param UIDs
+ * @returns {ToDoList}
+ */
+ToDoList.prototype.sortByUID = function(UIDs) {
+  this.toDoItems = this.toDoItems.map(function(el){
+    if (el.firstCompletedItem) {
+      delete el.firstCompletedItem;
+      return el
+    }
+
+    return el;
+  });
+
+  this.toDoItems.sort(function (a, b) {
+    return UIDs.indexOf(a.UID) - UIDs.indexOf(b.UID);
+  });
 
   return this;
 };

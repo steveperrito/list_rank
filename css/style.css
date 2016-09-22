@@ -1,11 +1,45 @@
 html, body {
-  background: #FDFDFD;
+  /*background: #FDFDFD;*/
+  background: #ebe7df;
   font-size: large;
 }
 
 h1, h2, h3, h4, h5, h6 {
   text-align: center;
   margin-bottom: 20px;
+}
+
+form {
+  margin-bottom:0;
+}
+
+.fontAwesome {
+  font-family: 'Helvetica', 'Glyphicons Halflings', sans-serif;
+}
+
+#gh-img {
+  /*background: #ebe7df;*/
+  /*border-radius: 100%;*/
+}
+
+.border-left{
+  border-left: 1px solid #ebe7df;
+}
+
+.border-right {
+  border-right: 1px solid #ebe7df;
+}
+
+.navbar-inverse .navbar-brand:hover {
+  background: #ebe7df;
+}
+
+.action-btns {
+  visibility: hidden;
+}
+
+tr:hover td>div.action-btns {
+  visibility: visible;
 }
 
 .form-inline .stars {
@@ -30,11 +64,68 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
 }
 
-@media (min-width: 414px) {
+.grab {
+  cursor: move;
+  color: #ebe7df;
+}
+
+.text-sm {
+  font-size: 12px;
+}
+
+.table>tbody>tr>td {
+  vertical-align: middle;
+}
+
+nav.navbar-inverse {
+  /*background: linear-gradient(to top, #383838, #000, #383838);*/
+  background: rgba(204, 204, 204, .5);
+  border: none;
+}
+
+.nav > li > a:hover {
+  background: inherit;
+}
+
+.nav > li > a {
+  font-size: 18px;
+}
+
+.not-visible {
+  opacity: 0;
+}
+
+.visibility-toggle {
+  -webkit-transition: opacity 0.5s;
+  -moz-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}
+
+#to-do-item {
+  border: none;
+  height: 75px;
+  font-size: 38px;
+  font-weight:100;
+  background: transparent;
+  width:65%;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  border-radius: inherit;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+@media (min-width: 650px) {
   #create-to-do {
     /*font-size: medium;*/
     flex-direction: row;
   }
+  /*#to-do-item {
+    width: 100%;
+  }*/
 }
 
 .well {
@@ -51,6 +142,7 @@ span.glyphicon-star {
 
 .table {
   font-size: large;
+  table-layout: fixed;
 }
 
 .form-control {
@@ -96,7 +188,8 @@ table tbody tr {
 }
 
 .completed .opacity {
-  opacity: 0.5;
+  /*opacity: 0.5;*/
+  color: #ebe7df;
 }
 
 .gold {
@@ -104,7 +197,8 @@ table tbody tr {
 }
 
 .completed .gold {
-  color: #d7b700;
+  /*color: #d7b700;*/
+  color: #ebe7df;
 }
 
 .pointer {
