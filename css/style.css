@@ -118,6 +118,17 @@ nav.navbar-inverse {
   box-shadow: none;
 }
 
+.clear-completed {
+  text-decoration: none;
+  font-size: 12px;
+  color: #555;
+  display:none;
+}
+
+.clear-completed:hover {
+  text-decoration: none;
+}
+
 @media (min-width: 650px) {
   #create-to-do {
     /*font-size: medium;*/

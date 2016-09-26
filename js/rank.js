@@ -6,7 +6,8 @@ $(function(){
     savedToDos = savedData ? JSON.parse(savedData) : [],
     myToDoList = new ToDoList(savedToDos),
     toDoInput = $('#to-do-item'),
-    toggleVisibility = $('.visibility-toggle');
+    toggleVisibility = $('.visibility-toggle'),
+    clearCompletedLink = $('.clear-completed');
 
   writeToDoList(tableArea, myToDoList.render('template'));
 
@@ -14,7 +15,7 @@ $(function(){
   toDoInput.on('input', function(){
     if (!$(this).val()) {
 
-      //stop function if to items are listed.
+      //stop function if to-do items are listed.
       if(myToDoList.toDoItems.length > 0) return;
 
       //otherwise hide visible elements since input val is falsy
@@ -58,8 +59,9 @@ $(function(){
         sortOrder.push(thisUID);
       });
 
-      /*console.log(sortOrder);*/
-      myToDoList.sortByUID(sortOrder);
+      myToDoList
+        .sortByUID(sortOrder)
+        .save();
 
       writeToDoList(tableArea, myToDoList.render('template'));
     }
@@ -89,6 +91,16 @@ $(function(){
 
     //Sort Column
     sortColumn(btn, column, currentSortDirection, nextSortDirection);
+  });
+
+  //Listen for & handle 'clear completed' link
+  clearCompletedLink.click(function (e) {
+    e.preventDefault();
+    myToDoList
+      .clearCompleted()
+      .save();
+
+    writeToDoList(tableArea, myToDoList.render('template'));
   });
 
   //Listen for and Handle Action Buttons
@@ -175,6 +187,14 @@ $(function(){
     container
       .empty()
       .html(HTML);
+
+    //Show clear completed link if there are completed items
+    if (myToDoList.hasCompletedItems()) {
+      if (!clearCompletedLink.is(':visible')) clearCompletedLink.fadeIn();
+    }
+    else {
+      if (clearCompletedLink.is(':visible')) clearCompletedLink.fadeOut();
+    }
 
     //Activate Tool-tips
     activateToolTips($('[data-toggle="tooltip"]'));

@@ -68,6 +68,30 @@ ToDoList.prototype.remove = function(itemUID) {
 };
 
 /**
+ * Removes all completed tasks.
+ *
+ * @returns {ToDoList}
+ */
+ToDoList.prototype.clearCompleted = function () {
+  this.toDoItems = this.toDoItems.filter(function (el) {
+    return !el.completed;
+  });
+
+  return this;
+};
+
+/**
+ * Returns true if some item is marked as completed
+ *
+ * @returns {boolean}
+ */
+ToDoList.prototype.hasCompletedItems = function () {
+  return this.toDoItems.some(function(el){
+    return el.completed;
+  });
+};
+
+/**
  * Edits to-do item.
  *
  * @param itemUID {String}
