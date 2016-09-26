@@ -96,7 +96,7 @@
          <div class="action-btns">
           <span data-toggle="tooltip" title="delete" class="glyphicon glyphicon-remove-circle text-danger rmvIt" data-item="{{UID}}"></span> |
          <span data-toggle="tooltip" title="edit" class="glyphicon glyphicon-edit text-info pointer" data-item="{{UID}}"></span> |
-         <span data-toggle="tooltip" title="mark {{^completed}}complete{{/completed}}{{#completed}}incomplete{{/completed}}" class="glyphicon glyphicon-ok-circle {{#completed}}text-success{{/completed}} pointer" data-item="{{UID}}"></span>
+         <span data-toggle="tooltip" title="mark {{^completed}}complete{{/completed}}{{#completed}}incomplete{{/completed}}" class="glyphicon {{^completed}}glyphicon-unchecked{{/completed}} {{#completed}}glyphicon-check text-success{{/completed}} pointer" data-item="{{UID}}"></span>
          </div>
        </td>
      </tr>

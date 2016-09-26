@@ -120,7 +120,7 @@ $(function(){
     }
 
     //Mark To-Do Complete
-    if (action.hasClass('glyphicon-ok-circle') && !action.hasClass('text-success')) {
+    if (action.hasClass('glyphicon-unchecked')) {
       var completedToDo = action.attr('data-item');
       myToDoList
         .complete(completedToDo)
@@ -132,7 +132,7 @@ $(function(){
     }
 
     //Mark To-Do Incomplete
-    if (action.hasClass('glyphicon-ok-circle') && action.hasClass('text-success')) {
+    if (action.hasClass('glyphicon-check')) {
       var uncompletedToDo = action.attr('data-item');
       myToDoList
         .notComplete(uncompletedToDo)
