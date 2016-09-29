@@ -18,6 +18,10 @@
   "homepage": "https://github.com/steveperrito/list_rank#readme",
   "dependencies": {
     "jquery": "^3.1.0",
-    "mustache": "^2.2.1"
+    "mustache": "^2.2.1",
+    "sortablejs": "^1.4.2"
+  },
+  "devDependencies": {
+    "webpack": "^1.13.2"
   }
 }
