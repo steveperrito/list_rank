@@ -1,78 +1,250 @@
-html {
-    background: #FDFDFD;
+html, body {
+  /*background: #FDFDFD;*/
+  background: #ebe7df;
+  font-size: large;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.stars {
-    display: inline-block;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.active, .beenRated {
-    color: #EFCC00;
-}
-
-.beenRatedRank {
-    color: #EFCC00;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 form {
-    width: 600px;
-    margin: inherit;
+  margin-bottom:0;
 }
 
-.well{
-    background: rgba(204,204,204,.5);
+.fontAwesome {
+  font-family: 'Helvetica', 'Glyphicons Halflings', sans-serif;
+}
+
+#gh-img {
+  /*background: #ebe7df;*/
+  /*border-radius: 100%;*/
+}
+
+.border-left{
+  border-left: 1px solid #ebe7df;
+}
+
+.border-right {
+  border-right: 1px solid #ebe7df;
+}
+
+.navbar-inverse .navbar-brand:hover {
+  background: #ebe7df;
+}
+
+.action-btns {
+  visibility: hidden;
+}
+
+.sortable-ghost {
+  visibility: hidden;
+}
+
+tr:hover td>div.action-btns {
+  visibility: visible;
+}
+
+.form-inline .stars {
+  line-height: 1;
+  display: inline-block;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.active, .beenRated {
+  color: #EFCC00;
+}
+
+.beenRatedRank {
+  color: #EFCC00;
+}
+
+#create-to-do {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.grab {
+  cursor: move;
+  color: #ebe7df;
+}
+
+.text-sm {
+  font-size: 12px;
+}
+
+.table>tbody>tr>td {
+  vertical-align: middle;
+}
+
+nav.navbar-inverse {
+  /*background: linear-gradient(to top, #383838, #000, #383838);*/
+  background: rgba(204, 204, 204, .5);
+  border: none;
+}
+
+.nav > li > a:hover {
+  background: inherit;
+}
+
+.nav > li > a {
+  font-size: 18px;
+}
+
+.not-visible {
+  opacity: 0;
+}
+
+.visibility-toggle {
+  -webkit-transition: opacity 0.5s;
+  -moz-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}
+
+#to-do-item {
+  border: none;
+  height: 75px;
+  font-size: 38px;
+  font-weight:100;
+  background: transparent;
+  width:65%;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  border-radius: inherit;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.clear-completed {
+  text-decoration: none;
+  font-size: 12px;
+  color: #555;
+  -webkit-transition: opacity 0.5s;
+  -moz-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  opacity: 0;
+}
+
+.clear-completed.fade-in {
+  opacity:1;
+}
+
+.clear-completed:hover {
+  text-decoration: none;
+}
+
+@media (min-width: 650px) {
+  #create-to-do {
+    /*font-size: medium;*/
+    flex-direction: row;
+  }
+  /*#to-do-item {
+    width: 100%;
+  }*/
+}
+
+.well {
+  background: rgba(204, 204, 204, .5);
 }
 
 .cloneBtn {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 span.glyphicon-star {
-    font-size: 1.2em;
+  font-size: 1.2em;
 }
 
 .table {
-    display: none;
+  font-size: large;
+  table-layout: fixed;
+}
+
+.form-control {
+  font-size: large;
+  display: inline-block;
+  width: auto;
+  height: auto;
 }
 
 .rmvIt {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .star {
-    margin-left: -3px;
+  margin-left: -3px;
 }
 
 .glyphicon-sort {
-    cursor: grab;
-    cursor: -webkit-grab;
+  cursor: grab;
+  cursor: -webkit-grab;
 }
 
 .glyphicon-sort:active {
-    cursor: grabbing;
-    cursor: -webkit-grabbing;
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
 }
 
 table tbody tr {
-    background: white;
+  background: white;
 }
 
 .chkedOff {
-    opacity: 0.25;
+  opacity: 0.25;
 }
 
 .nowRated {
-    margin-left: -3px;
-    cursor: default;
+  margin-left: -3px;
+  cursor: default;
 }
 
 .editable {
-    border: 0;
+  border: 0;
 }
+
+.completed .opacity {
+  /*opacity: 0.5;*/
+  color: #ebe7df;
+}
+
+.gold {
+  color: #EFCC00;
+}
+
+.completed .gold {
+  /*color: #d7b700;*/
+  color: #ebe7df;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+.table>tbody>tr>td.completed-mark {
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  border: none;
+}
+
+/*span.glyphicon {
+  display: inline-block;
+}*/
+
+/*
+.completed td .glyphicon-ok-circle {
+  color:
+}*/

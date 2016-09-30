@@ -1,88 +1,113 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title></title>
-    <link rel="stylesheet" href="css/bootstrap.css"/>
-    <link rel="stylesheet" href="css/style.css"/>
-    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="js/jquery-ui.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>To-Do List with Rank v2</title>
+  <link rel="stylesheet" href="css/bootstrap.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 
 <body>
-    <div class="container-fluid">
-        <nav class="navbar navbar-inverse" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="http://www.github.com/steveperrito">List it 'n rank it!</a>
-            </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                   <li>
-                       <a href="#">
-                           <div class="btn-group">
-                               <button type="button" class="btn btn-primary active btn-xs github">
-                                   <span class="glyphicon glyphicon-thumbs-up"></span> GitHub
-                               </button>
-                           </div>
-                       </a>
-                   </li>
-                </ul>
-            </div>
-        </nav>
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3 well">
-                    <h2>Rank item below</h2>
-                <form action="#" class="form-inline" role="form">
-                    <input class="listItem" type="text"/>
+<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+  <div class="navbar-header">
+    <a class="navbar-brand" href="http://www.github.com/steveperrito" target="_blank">
+      <img id="gh-img" src="http://steveperrito.github.io/img/GitHub-Mark-120px-plus.png" alt="github" height="25">
+    </a>
+    <a href="http://www.linkedin.com/in/steveperry33" class="navbar-brand border-left border-right" target="_blank">
+      <img src="http://steveperrito.github.io/img/LinkedIn-InBug-2C.png" alt="linkedin" height="25">
+    </a>
+    <a href="http://stackoverflow.com/users/3990308/steve-perry" class="navbar-brand" target="_blank">
+      <img src="img/so-icon.png" alt="stackoverflow" height="25">
+    </a>
+  </div>
+</nav>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+      <div class="well text-center">
+        <!--<h2>Add A To-Do</h2>-->
+        <form id="create-to-do" action="#" class="form-inline" role="form">
+          <input autocomplete="off" autofocus id="to-do-item" class="listItem form-control fontAwesome" type="search" placeholder="&#x270f; add a task">
 
-                    <div class="stars">
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                        <span class="star glyphicon glyphicon-star"></span>
-                    </div>
-                    <button class="btn btn-primary btn-xs cloneBtn">Rank Item</button>
+          <div class="stars visibility-toggle not-visible">
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+            <span class="star glyphicon glyphicon-star"></span>
+          </div>
+          <button class="btn btn-primary btn-lg save visibility-toggle not-visible">Add</button>
 
-                </form>
-            </div>
-        </div>
-        <div style="display: none;">
-            <table>
-                <tbody>
-                <tr class="cloneMeSon">
-                    <td class="saveList"></td>
-                    <td class="saveRank"></td>
-                    <td><span class="glyphicon glyphicon-remove-sign rmvIt"></span></td>
-                    <td><span class="glyphicon glyphicon-ok-circle"></span></td>
-                    <td><span class="glyphicon glyphicon-sort"></span></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-                <table id="items" class="table">
-                    <tr>
-                        <th>Item</th>
-                        <th>Rank</th>
-                        <th>Remove</th>
-                        <th>Mark Complete</th>
-                        <th>Move</th>
-                    </tr>
-                    <tbody class="appendClone">
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        </form>
+      </div>
     </div>
+  </div>
+  <div class="row">
+    <div id="table-wrap" class="col-lg-8 col-lg-offset-2">
+      <table id="items" class="table visibility-toggle not-visible">
+        <colgroup>
+          <col style="width:30px;">
+          <col>
+          <col style="width:130px;">
+          <col style="width:130px;">
+        </colgroup>
+        <tr>
+          <th></th>
+          <th><span data-attr="item" class="glyphicon glyphicon-sort-by-attributes text-info pointer sort"></span> Item</th>
+          <th><span data-attr="rank" class="glyphicon glyphicon-sort-by-attributes text-info pointer sort"></span> Rank</th>
+          <th></th>
+        </tr>
+        <tbody class="appendClone">
+        </tbody>
+      </table>
+      <div><a href="#" class="clear-completed pull-right"><span class="glyphicon glyphicon-remove-circle"></span> clear completed items</a></div>
+    </div>
+  </div>
+</div>
 
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/rank.js"></script>
+<script id="template" type="x-tmpl-mustache">
+  {{#items}}
+    {{#firstCompletedItem}}
+      <tr>
+        <td class="completed-mark text-center well well-sm" colspan="4">Finished Tasks</td>
+      </tr>
+    {{/firstCompletedItem}}
+    <tr id="{{UID}}" class="{{#completed}}completed{{/completed}}">
+       <td class="handle text-sm align-middle"><span class="glyphicon glyphicon-th grab"></span></td>
+       <td class="opacity item {{#completed}}strike{{/completed}}">{{item}}</td>
+       <td class="rank">{{{ranking}}}</td>
+       <td class="text-right">
+         <div class="action-btns">
+          <span data-toggle="tooltip" title="delete" class="glyphicon glyphicon-remove-circle text-danger rmvIt" data-item="{{UID}}"></span> |
+         <span data-toggle="tooltip" title="edit" class="glyphicon glyphicon-edit text-info pointer" data-item="{{UID}}"></span> |
+         <span data-toggle="tooltip" title="mark {{^completed}}complete{{/completed}}{{#completed}}incomplete{{/completed}}" class="glyphicon {{^completed}}glyphicon-unchecked{{/completed}} {{#completed}}glyphicon-check text-success{{/completed}} pointer" data-item="{{UID}}"></span>
+         </div>
+       </td>
+     </tr>
+  {{/items}}
+</script>
+
+<script id="edit-row" type="x-tmpl-mustache">
+  {{#items}}
+  <td></td>
+   <td class="opacity item"><input id="item-{{UID}}" name="item-{{UID}}" value="{{item}}" type="text"></td>
+   <td class="rank">
+     <div id="stars-{{UID}}" class="stars">
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+       <span class="star glyphicon glyphicon-star"></span>
+     </div>
+   </td>
+   <td class="text-right">
+     <span data-toggle="tooltip" title="save edits" class="glyphicon glyphicon-save text-success saveIt pointer" data-item="{{UID}}"></span> |
+     <span data-toggle="tooltip" title="cancel edits" class="glyphicon glyphicon-remove-circle pointer cancel-edits" data-item="{{UID}}"></span>
+   </td>
+  {{/items}}
+</script>
+
+<script type="text/javascript" src="dist/rank.js"></script>
+
 </body>
 </html>

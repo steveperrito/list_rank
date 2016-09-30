@@ -1,264 +1,318 @@
+import Sortable from 'sortablejs';
+import 'bootstrap/js/tooltip';
+import ToDoList from './models/ToDoList.js';
 
 $(function(){
-    $('.github').click(function(){
-        window.location = 'https://github.com/steveperrito/list_rank';
-    });
-});
+  var tableArea = $('.appendClone'),
+    addToDoButton = $('.save'),
+    sortButtons = $('.sort'),
+    savedData = localStorage.getItem('ToDoList'),
+    savedToDos = savedData ? JSON.parse(savedData) : [],
+    myToDoList = new ToDoList(savedToDos),
+    toDoInput = $('#to-do-item'),
+    toggleVisibility = $('.visibility-toggle'),
+    clearCompletedLink = $('.clear-completed');
 
-$(function(){
-    //listen for ranking...
-    setListeners();
+  writeToDoList(tableArea, myToDoList.render('template'));
 
-    //see if they've ranked anything before
-    var getTheStored = JSON.parse(localStorage.getItem('savedList'));
-    var toLocalStorage = [];
+  //Fade in add-to-do controls
+  toDoInput.on('input', function(){
+    if (!$(this).val()) {
 
-    if (getTheStored != null && getTheStored.length >=1){
-        toLocalStorage = getTheStored;
-        toLocalStorage.forEach(function(obj){
-            buildSavedItems(obj);
-        });
-    } else {
-        toLocalStorage = [];
+      //stop function if to-do items are listed.
+      if(myToDoList.toDoItems.length > 0) return;
+
+      //otherwise hide visible elements since input val is falsy
+      toggleVisibility.each(function () {
+        if (!$(this).hasClass('not-visible')) {
+          $(this).addClass('not-visible');
+        }
+      })
     }
+    //Since input val is truthy, make sure elements are visible.
+    else {
+      toggleVisibility.each(function () {
+        if ($(this).hasClass('not-visible')) {
+          $(this).removeClass('not-visible');
+        }
+      });
+    }
+  });
 
-    //fix for jquery ui sortable problem...
-    var fixHelper = function(e, ui) {
-        ui.children().each(function() {
-            $(this).width($(this).width());
-        });
-        return ui;
+  var sortable = Sortable.create(tableArea[0], {
+    handle: '.handle',
+    animation: 0,
+    draggable: 'tr',
+    forceFallback: true,
+    onUpdate: function(){
+      let sortOrder = [];
+      tableArea.find('tr').each(function(){
+        let thisUID = $(this).attr('id');
+        sortOrder.push(thisUID);
+      });
+
+      myToDoList
+        .sortByUID(sortOrder)
+        .save();
+
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
+  });
+
+  //Listen for Item Add
+  addToDoButton.click(function(e){
+    e.preventDefault();
+    var toDoItem = toDoInput.val();
+    var rankedClass = $('.beenRated');
+    var itemRank = rankedClass.length;
+    var newToDo = {
+      item : toDoItem,
+      rank : itemRank
     };
 
-    //make items sortable (jquery ui)
-    $('.appendClone').sortable({
-        helper: fixHelper,
-        axis: "y",
-        containment: "parent",
-        handle: ".glyphicon-sort",
-        revert: false,
-        tolerance: "pointer",
-        //function to update order of stored items, called after sort
-        update: function() {
-            var newOrder = [];
-            $('tr[data-guid]').each(function(){
-                var guid = $(this).attr('data-guid');
-                newOrder.push(guid);
-            });
-            newOrder.forEach(function(guid){
-                toLocalStorage.forEach(function(listItem){
-                    if(guid == listItem.id){
-                        listItem.sortOrder = newOrder.indexOf(guid);
-                    }
-                })
-            });
-            toLocalStorage.sort(function(a,b){
-                return a.sortOrder - b.sortOrder;
-            });
-            storeItBaby(toLocalStorage);
-        }
-    }).disableSelection();
+    //Add Item
+    addToDo(newToDo, toDoInput, rankedClass);
+  });
 
-    //Remove, Mark Complete, Edit Item, & Edit Rank
-    $('#items').on('click', function(e){
-        var t = e.target;
-        if($(t).hasClass('rmvIt')){ //Remove Item
-            $(t).closest('tr').fadeOut(500, function(){
-                var thisTR = $(this);
-                toLocalStorage.forEach(function(e){
-                    if(thisTR.attr('data-guid') == e.id){
-                        var indexOfAry = toLocalStorage.indexOf(e);
-                        toLocalStorage.splice(indexOfAry, 1);
-                        storeItBaby(toLocalStorage);
-                    } else {
-                        return 0;
-                    }
-                });
-                $(this).remove();
-                if($('.beenRatedRank').length == 0) {$('.table').fadeOut(500)};
-            })
-        } else if ($(t).hasClass('glyphicon-ok-circle')){ //Mark Complete
-            var thisTR = $(t).closest('tr');
-            thisTR.toggleClass('chkedOff');
-            toLocalStorage.forEach(function(e){
-                if(thisTR.attr('data-guid') == e.id){
-                    e.checked = !e.checked;
-                    storeItBaby(toLocalStorage);
-                } else {
-                    return 0;
-                }
-            });
-        } else if ($(t).hasClass('saveList')){ //Edit Item
-            var thisTd = $(t).closest('td');
-            var thisTR = $(t).closest('tr');
-            var itemID = thisTR.attr('data-guid');
-            var indexOfItem;
-            var tdLength = thisTd.width();
-            var frmField = $('<input />', {
-                'class': 'editable',
-                'width': ((tdLength<100)?'100':tdLength)
-            });
-            var originalText = thisTd.text();
-            toLocalStorage.forEach(function(e){
-                if(itemID == e.id){
-                    indexOfItem = toLocalStorage.indexOf(e);
-                }
-            });
+  //Listen for and Handle Column Sorts
+  sortButtons.click(function(){
+    var btn = $(this);
+    var column = btn.attr('data-attr');
+    var currentSortDirection = btn.hasClass('glyphicon-sort-by-attributes') ? 'asc' : 'desc';
+    var nextSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
 
-            frmField.val(originalText);
-            thisTd.empty();
-            thisTd.append(frmField);
-            frmField.select();
+    //Sort Column
+    sortColumn(btn, column, currentSortDirection, nextSortDirection);
+  });
 
-            frmField.on('input', function(){
-                toLocalStorage[indexOfItem].item = $(this).val();
-                storeItBaby(toLocalStorage);
-            });
-            frmField.on('blur', function(){
-                var newText = $(this).val();
-                thisTd.empty();
-                thisTd.text(newText);
-            })
-        } else if ($(t).hasClass('nowRated')){ //Edit Rating
-            var parentDiv = $(t).closest('div');
-            parentDiv.addClass('stars');
-            parentDiv.find('.beenRatedRank').each(function(){
-                $(this).addClass('beenRated');
-                $(this).removeClass('beenRatedRank');
-            });
-            parentDiv.find('.nowRated').each(function(){
-                $(this).addClass('star wasChanged');
-                $(this).removeClass('nowRated');
-            });
-            setListeners();
-        } else if ($(t).hasClass('wasChanged')){ //Finished Rating Edit
-            var closestTR = $(t).closest('tr');
-            var closestTD = $(t).closest('td');
-            var parentDiv = $(t).closest('div');
-            var starRankID = closestTR.attr('data-guid');
-            var indexOfStarRank;
+  //Listen for & handle 'clear completed' link
+  clearCompletedLink.click(function (e) {
+    e.preventDefault();
+    myToDoList
+      .clearCompleted()
+      .save();
 
-            toLocalStorage.forEach(function(e){
-                if(starRankID == e.id){
-                    indexOfStarRank = toLocalStorage.indexOf(e);
-                }
-            });
+    writeToDoList(tableArea, myToDoList.render('template'));
+  });
 
-            toLocalStorage[indexOfStarRank].stars = parentDiv.find('.beenRated').length;
-            storeItBaby(toLocalStorage);
+  //Listen for and Handle Action Buttons
+  tableArea.click(function(e){
+    var action = $(e.target);
 
-            parentDiv.find('.wasChanged').each(function(){
-                $(this).removeClass('star wasChanged');
-            });
-            var updatedRank = storeRanking(parentDiv);
-            closestTD.empty();
-            closestTD.append(updatedRank);
-        } else {
-            return 0;
-        }
-    });
+    //Delete To-Do.
+    if (action.hasClass('rmvIt')) {
+      var elementToDelete = action.attr('data-item');
+      myToDoList
+        .remove(elementToDelete)
+        .sortByStatus()
+        .markFirstCompleted()
+        .save();
 
-    function setListeners(){
-        $('.stars').on('mouseover', '.star', function(){
-            var el = $(this);
-            el.addClass('active');
-            el.prevAll('.star').addClass('active');
-        });
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
 
-        $('.stars').on('mouseout', '.star', function() {
-            var el = $(this);
-            el.removeClass('active');
-            el.prevAll('.star').removeClass('active');
-        });
+    //Mark To-Do Complete
+    if (action.hasClass('glyphicon-unchecked')) {
+      var completedToDo = action.attr('data-item');
+      myToDoList
+        .complete(completedToDo)
+        .sortByStatus()
+        .markFirstCompleted()
+        .save();
 
-        $('.stars').on('click', '.star', function(){
-            var el = $(this);
-            $('.beenRated').each(function () {
-                $(this).removeClass('beenRated');
-            });
-            $('.star').each(function (){
-            });
-            el.addClass('beenRated');
-            el.prevAll('.star').addClass('beenRated');
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
+
+    //Mark To-Do Incomplete
+    if (action.hasClass('glyphicon-check')) {
+      var uncompletedToDo = action.attr('data-item');
+      myToDoList
+        .notComplete(uncompletedToDo)
+        .sortByStatus()
+        .markFirstCompleted()
+        .save();
+
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
+
+    //Make To-Do Editable
+    if (action.hasClass('glyphicon-edit')) {
+      var toDoToEdit = action.attr('data-item');
+      var toDoRow = $('#' + toDoToEdit);
+
+      writeToDoList(toDoRow, myToDoList.renderEditable('edit-row', toDoToEdit));
+    }
+
+    //Save Edits
+    if (action.hasClass('glyphicon-save')) {
+      var toDoToUpdate = action.attr('data-item');
+      var itemToUpdate = $('#item-' + toDoToUpdate).val();
+      var rankingToUpdate = $('#stars-' + toDoToUpdate).find('.beenRated').length;
+      var allEdits = {
+        'item' : itemToUpdate,
+        'rank' : rankingToUpdate
+      };
+
+      myToDoList
+        .edit(toDoToUpdate, allEdits)
+        .save();
+
+      writeToDoList(tableArea, myToDoList.render('template'))
+    }
+
+    //Cancel Editing
+    if (action.hasClass('cancel-edits')) {
+      writeToDoList(tableArea, myToDoList.render('template'));
+    }
+  });
+
+  /**
+   * Updates or writes to-do list to dom and sets listeners for
+   * future user interactions. Optional callback provided.
+   *
+   * @param container {jQuery} - HTML table body to which HTML is appended
+   * @param HTML {String} - Table rows in html.
+   * @param cb [Function] - Optional Callback function.
+   */
+  function writeToDoList(container, HTML, cb) {
+    //Populate Table or Row
+    container
+      .empty()
+      .html(HTML);
+
+    //Show clear completed link if there are completed items
+    if (myToDoList.hasCompletedItems()) {
+      if (!clearCompletedLink.hasClass('fade-in')) clearCompletedLink.addClass('fade-in');
+    }
+    else {
+      if (clearCompletedLink.hasClass('fade-in')) clearCompletedLink.removeClass('fade-in');
+    }
+
+    //Activate Tool-tips
+    activateToolTips($('[data-toggle="tooltip"]'));
+
+    //Set listeners for rankings
+    listenForRank($('.stars'));
+
+    //Fade in add-to-do controls if needed
+    if (myToDoList.toDoItems.length > 0) {
+      toggleVisibility
+        .each(function () {
+          if ($(this).hasClass('not-visible')) {
+            $(this).removeClass('not-visible');
+          }
         });
     }
 
-    $('.cloneBtn').click(function(e){ //Rank New Item
-        e.preventDefault();
-
-        var cloneMe = $('.cloneMeSon:eq(0)');
-        var cloneMeRanking = $('.stars:eq(0)').clone();// The stars that have been ranked
-        var appendClone = $('.appendClone');
-        var appendData = cloneMe.clone();
-        var listItem = $('.listItem').val(); //Item being Ranked
-        var storageID = ID();
-        var storageObj = { //Obj to be stored
-            id: storageID,
-            stars: cloneMeRanking.find('.beenRated').length,
-            item: listItem,
-            checked: false
-        };
-
-        if (listItem === '' || $('.beenRated').length == 0) {
-            alert('What the hell! Add a list item Or at least Rank it!');
-        } else {
-            $('.table').fadeIn(500);
-            appendData.find('td.saveList').append(listItem);
-            appendData.find('td.saveRank').append(storeRanking(cloneMeRanking));
-            appendData.closest('tr').attr('data-guid',storageID);
-            appendClone.append(appendData);
-            $('.listItem').val('');
-            $('.beenRated').each(function () {
-                $(this).removeClass('beenRated');
-            });
-            toLocalStorage.push(storageObj);
-            storeItBaby(toLocalStorage);
-        }
-    });
-
-    function storeRanking(div){ //Strip Div/Children of classes that trigger listeners and preserve rank
-        div.removeClass('stars');
-        div.children().each(function() {
-            $(this).addClass('nowRated');
+    else {
+      toggleVisibility
+        .each(function () {
+          if(!$(this).hasClass('not-visible')) {
+            $(this).addClass('not-visible');
+          }
         })
-        div.find('.beenRated').each(function(){
-            $(this).addClass('beenRatedRank');
-            $(this).removeClass('beenRated');
-            $(this).removeClass('active');
-        });
-        return div;
     }
 
-    function ID() { //Generate unique ID for items
-        return '_' + Math.random().toString(36).substr(2, 9);
+    //Callback (if provided)
+     if (cb) {
+       cb();
+     }
+  }
+
+  /**
+   * Listens for ranking events. Can be called
+   * multiple times for new Dom content.
+   *
+   * @param starWrapper {jQuery}
+   */
+  function listenForRank(starWrapper) {
+    //Set 'Select Ranking' Listeners:
+    starWrapper.on('mouseover', '.star', function(){
+      var el = $(this);
+      el.addClass('active');
+      el.prevAll('.star').addClass('active');
+    });
+
+    starWrapper.on('mouseout', '.star', function() {
+      var el = $(this);
+      el.removeClass('active');
+      el.prevAll('.star').removeClass('active');
+    });
+
+    starWrapper.on('click', '.star', function(){
+      var el = $(this);
+      //Clear previous rating.
+      $('.beenRated').each(function(){
+        $(this).removeClass('beenRated');
+      });
+      //Add current rating
+      el.addClass('beenRated').removeClass('active');
+      el.prevAll('.star').addClass('beenRated').removeClass('active');
+    });
+  }
+
+  /**
+   * Activates Bootstrap's tooltips. Can be called
+   * multiple times for new Dom content.
+   *
+   * @param toolTips {jQuery}
+   */
+  function activateToolTips(toolTips) {
+    /*$('[data-toggle="tooltip"]')*/
+
+    toolTips.tooltip({
+      template : '<div class="tooltip" role="tooltip"><div class="tooltip-inner"></div></div>',
+      delay: { "show": 1000, "hide": 100 }
+    });
+  }
+
+  /**
+   * Adds to-do item to class and writes table
+   *
+   * @param newToDo {Object}
+   * @param toDoInput {jQuery}
+   * @param rankedClass {jQuery}
+   */
+  function addToDo(newToDo, toDoInput, rankedClass) {
+
+    myToDoList
+      .add(newToDo)
+      .sortByStatus()
+      .markFirstCompleted()
+      .save();
+
+    writeToDoList(tableArea, myToDoList.render('template'), function(){
+      toDoInput.val('');
+      rankedClass.each(function(){
+        $(this).removeClass('beenRated');
+      })
+    });
+  }
+
+  /**
+   * Sorts to-do list by column and writes table.
+   *
+   * @param btn {jQuery}
+   * @param column {String} - 'item' or 'rank'
+   * @param currentSortDirection {String} - 'asc' or 'desc'
+   * @param nextSortDirection {String} - 'asc' or 'des'
+   */
+  function sortColumn(btn, column, currentSortDirection, nextSortDirection) {
+    var icons = {
+      'asc' : 'glyphicon-sort-by-attributes',
+      'desc' : 'glyphicon-sort-by-attributes-alt'
     };
 
-    function storeItBaby (obj){ //Store changes
-        localStorage.setItem('savedList', JSON.stringify(obj));
-    }
+    myToDoList
+      .sortIncompleteBy(column, nextSortDirection)
+      .markFirstCompleted()
+      .save();
 
-    function buildSavedItems (obj){ //Remember what user left off on.
-        var cloneMe = $('.cloneMeSon:eq(0)');
-        var cloneMeRanking = $('.stars:eq(0)').clone();
-        var appendClone = $('.appendClone');
-        var appendData = cloneMe.clone();
-        var listItem = obj.item;
-        var stars = obj.stars;
-        var guid = obj.id;
-        var starsToBeRanked = cloneMeRanking.children();
+    writeToDoList(tableArea, myToDoList.render('template'), function(){
+      btn
+        .removeClass(icons[currentSortDirection])
+        .addClass(icons[nextSortDirection]);
+    });
+  }
 
-        $('.table').fadeIn(500);
-        appendData.find('td.saveList').append(listItem);
-        cloneMeRanking.closest('div').removeClass('stars');
-        starsToBeRanked.each(function(){
-            $(this).removeClass('star');
-            $(this).addClass('nowRated');
-        });
-        starsToBeRanked.eq(stars-1).addClass('beenRatedRank');
-        starsToBeRanked.eq(stars-1).prevAll().addClass('beenRatedRank');
-        appendData.find('td.saveRank').append(cloneMeRanking);
-        appendData.closest('tr').attr('data-guid',guid);
-        if(obj.checked == true) appendData.closest('tr').addClass('chkedOff');
-        appendClone.append(appendData);
-    }
 });
