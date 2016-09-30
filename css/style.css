@@ -38,6 +38,10 @@ form {
   visibility: hidden;
 }
 
+.sortable-ghost {
+  visibility: hidden;
+}
+
 tr:hover td>div.action-btns {
   visibility: visible;
 }

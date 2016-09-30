@@ -1,3 +1,4 @@
+import Sortable from 'sortablejs';
 import 'bootstrap/js/tooltip';
 import ToDoList from './models/ToDoList.js';
 
@@ -38,27 +39,15 @@ $(function(){
     }
   });
 
-  //Make rows sortable
-  /*tableArea.sortable({
+  var sortable = Sortable.create(tableArea[0], {
     handle: '.handle',
-    axis:'y',
-    helper: function(e, tr)
-    {
-      var $originals = tr.children();
-      var $helper = tr.clone();
-      //console.log($helper.children().length);
-      $helper.children().each(function(index)
-      {
-        // Set helper cell sizes to match the original sizes
-        console.log($originals.eq(index).outerWidth());
-        $(this).width($originals.eq(index).outerWidth());
-      });
-      return $helper;
-    },
-    stop: function (e, tr) {
-      var sortOrder = [];
+    animation: 0,
+    draggable: 'tr',
+    forceFallback: true,
+    onUpdate: function(){
+      let sortOrder = [];
       tableArea.find('tr').each(function(){
-        var thisUID = $(this).attr('id');
+        let thisUID = $(this).attr('id');
         sortOrder.push(thisUID);
       });
 
@@ -68,7 +57,7 @@ $(function(){
 
       writeToDoList(tableArea, myToDoList.render('template'));
     }
-  });*/
+  });
 
   //Listen for Item Add
   addToDoButton.click(function(e){
