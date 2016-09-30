@@ -1,3 +1,6 @@
+import 'bootstrap';
+import ToDoList from './models/ToDoList.js';
+
 $(function(){
   var tableArea = $('.appendClone'),
     addToDoButton = $('.save'),
@@ -36,14 +39,14 @@ $(function(){
   });
 
   //Make rows sortable
-  tableArea.sortable({
+  /*tableArea.sortable({
     handle: '.handle',
     axis:'y',
     helper: function(e, tr)
     {
       var $originals = tr.children();
       var $helper = tr.clone();
-      /*console.log($helper.children().length);*/
+      //console.log($helper.children().length);
       $helper.children().each(function(index)
       {
         // Set helper cell sizes to match the original sizes
@@ -65,7 +68,7 @@ $(function(){
 
       writeToDoList(tableArea, myToDoList.render('template'));
     }
-  });
+  });*/
 
   //Listen for Item Add
   addToDoButton.click(function(e){

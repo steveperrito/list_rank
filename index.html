@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>To-Do List with Rank v2</title>
@@ -29,7 +30,7 @@
       <div class="well text-center">
         <!--<h2>Add A To-Do</h2>-->
         <form id="create-to-do" action="#" class="form-inline" role="form">
-          <input autofocus id="to-do-item" class="listItem form-control fontAwesome" type="text" placeholder="&#x270f; add a task">
+          <input autocomplete="off" autofocus id="to-do-item" class="listItem form-control fontAwesome" type="search" placeholder="&#x270f; add a task">
 
           <div class="stars visibility-toggle not-visible">
             <span class="star glyphicon glyphicon-star"></span>
@@ -123,13 +124,14 @@
   {{/items}}
 </script>
 
-<script type="text/javascript" src="node_modules/mustache/mustache.min.js"></script>
+<!--<script type="text/javascript" src="node_modules/mustache/mustache.min.js"></script>-->
 <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>-->
-<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/models/ToDoList.js"></script>
-<script type="text/javascript" src="js/rank.js"></script>
+<!--<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>-->
+<!--<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>-->
+<!--<script type="text/javascript" src="js/bootstrap.min.js"></script>-->
+<!--<script type="text/javascript" src="js/models/ToDoList.js"></script>-->
+<!--<script type="text/javascript" src="js/rank.js"></script>-->
+<script type="text/javascript" src="dist/rank.js"></script>
 
 </body>
 </html>
