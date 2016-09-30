@@ -1,4 +1,4 @@
-import 'bootstrap';
+import 'bootstrap/js/tooltip';
 import ToDoList from './models/ToDoList.js';
 
 $(function(){
@@ -193,10 +193,10 @@ $(function(){
 
     //Show clear completed link if there are completed items
     if (myToDoList.hasCompletedItems()) {
-      if (!clearCompletedLink.is(':visible')) clearCompletedLink.fadeIn();
+      if (!clearCompletedLink.hasClass('fade-in')) clearCompletedLink.addClass('fade-in');
     }
     else {
-      if (clearCompletedLink.is(':visible')) clearCompletedLink.fadeOut();
+      if (clearCompletedLink.hasClass('fade-in')) clearCompletedLink.removeClass('fade-in');
     }
 
     //Activate Tool-tips
