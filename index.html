@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>To-Do List with Rank v2</title>
@@ -19,9 +20,6 @@
       <img src="img/so-icon.png" alt="stackoverflow" height="25">
     </a>
   </div>
-  <!--<a class="pull-right" href="https://github.com/steveperrito/list_rank">
-    <span class="glyphicon glyphicon-thumbs-up"></span> GitHub
-  </a>-->
 </nav>
 <div class="container-fluid">
   <div class="row">
@@ -29,7 +27,7 @@
       <div class="well text-center">
         <!--<h2>Add A To-Do</h2>-->
         <form id="create-to-do" action="#" class="form-inline" role="form">
-          <input autofocus id="to-do-item" class="listItem form-control fontAwesome" type="text" placeholder="&#x270f; add a task">
+          <input autocomplete="off" autofocus id="to-do-item" class="listItem form-control fontAwesome" type="search" placeholder="&#x270f; add a task">
 
           <div class="stars visibility-toggle not-visible">
             <span class="star glyphicon glyphicon-star"></span>
@@ -62,22 +60,9 @@
         <tbody class="appendClone">
         </tbody>
       </table>
+      <div><a href="#" class="clear-completed pull-right"><span class="glyphicon glyphicon-remove-circle"></span> clear completed items</a></div>
     </div>
   </div>
-
-  <!--<div style="display: none;">
-    <table>
-      <tbody>
-      <tr class="cloneMeSon">
-        <td class="saveList"></td>
-        <td class="saveRank"></td>
-        <td><span class="glyphicon glyphicon-remove-sign rmvIt"></span></td>
-        <td><span class="glyphicon glyphicon-ok-circle"></span></td>
-        <td><span class="glyphicon glyphicon-sort"></span></td>
-      </tr>
-      </tbody>
-    </table>
-  </div>-->
 </div>
 
 <script id="template" type="x-tmpl-mustache">
@@ -95,7 +80,7 @@
          <div class="action-btns">
           <span data-toggle="tooltip" title="delete" class="glyphicon glyphicon-remove-circle text-danger rmvIt" data-item="{{UID}}"></span> |
          <span data-toggle="tooltip" title="edit" class="glyphicon glyphicon-edit text-info pointer" data-item="{{UID}}"></span> |
-         <span data-toggle="tooltip" title="mark {{^completed}}complete{{/completed}}{{#completed}}incomplete{{/completed}}" class="glyphicon glyphicon-ok-circle {{#completed}}text-success{{/completed}} pointer" data-item="{{UID}}"></span>
+         <span data-toggle="tooltip" title="mark {{^completed}}complete{{/completed}}{{#completed}}incomplete{{/completed}}" class="glyphicon {{^completed}}glyphicon-unchecked{{/completed}} {{#completed}}glyphicon-check text-success{{/completed}} pointer" data-item="{{UID}}"></span>
          </div>
        </td>
      </tr>
@@ -122,13 +107,7 @@
   {{/items}}
 </script>
 
-<!--<script type="text/javascript" src="node_modules/mustache/mustache.min.js"></script>-->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/models/ToDoList.js"></script>
-<script type="text/javascript" src="js/rank.js"></script>
+<script type="text/javascript" src="dist/rank.js"></script>
 
 </body>
 </html>

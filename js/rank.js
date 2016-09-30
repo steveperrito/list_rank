@@ -1,3 +1,7 @@
+import Sortable from 'sortablejs';
+import 'bootstrap/js/tooltip';
+import ToDoList from './models/ToDoList.js';
+
 $(function(){
   var tableArea = $('.appendClone'),
     addToDoButton = $('.save'),
@@ -6,7 +10,8 @@ $(function(){
     savedToDos = savedData ? JSON.parse(savedData) : [],
     myToDoList = new ToDoList(savedToDos),
     toDoInput = $('#to-do-item'),
-    toggleVisibility = $('.visibility-toggle');
+    toggleVisibility = $('.visibility-toggle'),
+    clearCompletedLink = $('.clear-completed');
 
   writeToDoList(tableArea, myToDoList.render('template'));
 
@@ -14,7 +19,7 @@ $(function(){
   toDoInput.on('input', function(){
     if (!$(this).val()) {
 
-      //stop function if to items are listed.
+      //stop function if to-do items are listed.
       if(myToDoList.toDoItems.length > 0) return;
 
       //otherwise hide visible elements since input val is falsy
@@ -34,32 +39,21 @@ $(function(){
     }
   });
 
-  //Make rows sortable
-  tableArea.sortable({
+  var sortable = Sortable.create(tableArea[0], {
     handle: '.handle',
-    axis:'y',
-    helper: function(e, tr)
-    {
-      var $originals = tr.children();
-      var $helper = tr.clone();
-      /*console.log($helper.children().length);*/
-      $helper.children().each(function(index)
-      {
-        // Set helper cell sizes to match the original sizes
-        console.log($originals.eq(index).outerWidth());
-        $(this).width($originals.eq(index).outerWidth());
-      });
-      return $helper;
-    },
-    stop: function (e, tr) {
-      var sortOrder = [];
+    animation: 0,
+    draggable: 'tr',
+    forceFallback: true,
+    onUpdate: function(){
+      let sortOrder = [];
       tableArea.find('tr').each(function(){
-        var thisUID = $(this).attr('id');
+        let thisUID = $(this).attr('id');
         sortOrder.push(thisUID);
       });
 
-      /*console.log(sortOrder);*/
-      myToDoList.sortByUID(sortOrder);
+      myToDoList
+        .sortByUID(sortOrder)
+        .save();
 
       writeToDoList(tableArea, myToDoList.render('template'));
     }
@@ -91,6 +85,16 @@ $(function(){
     sortColumn(btn, column, currentSortDirection, nextSortDirection);
   });
 
+  //Listen for & handle 'clear completed' link
+  clearCompletedLink.click(function (e) {
+    e.preventDefault();
+    myToDoList
+      .clearCompleted()
+      .save();
+
+    writeToDoList(tableArea, myToDoList.render('template'));
+  });
+
   //Listen for and Handle Action Buttons
   tableArea.click(function(e){
     var action = $(e.target);
@@ -108,7 +112,7 @@ $(function(){
     }
 
     //Mark To-Do Complete
-    if (action.hasClass('glyphicon-ok-circle') && !action.hasClass('text-success')) {
+    if (action.hasClass('glyphicon-unchecked')) {
       var completedToDo = action.attr('data-item');
       myToDoList
         .complete(completedToDo)
@@ -120,7 +124,7 @@ $(function(){
     }
 
     //Mark To-Do Incomplete
-    if (action.hasClass('glyphicon-ok-circle') && action.hasClass('text-success')) {
+    if (action.hasClass('glyphicon-check')) {
       var uncompletedToDo = action.attr('data-item');
       myToDoList
         .notComplete(uncompletedToDo)
@@ -175,6 +179,14 @@ $(function(){
     container
       .empty()
       .html(HTML);
+
+    //Show clear completed link if there are completed items
+    if (myToDoList.hasCompletedItems()) {
+      if (!clearCompletedLink.hasClass('fade-in')) clearCompletedLink.addClass('fade-in');
+    }
+    else {
+      if (clearCompletedLink.hasClass('fade-in')) clearCompletedLink.removeClass('fade-in');
+    }
 
     //Activate Tool-tips
     activateToolTips($('[data-toggle="tooltip"]'));

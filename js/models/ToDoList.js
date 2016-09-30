@@ -1,10 +1,12 @@
+import Mustache from 'mustache';
+
 /**
  * Model class handles most data manipulation.
  *
  * @param {Array} toDoItems - objects that represent one to-do item.
  * @constructor
  */
-function ToDoList(toDoItems){
+export default function ToDoList(toDoItems){
   var That = this;
 
   this.toDoItems = toDoItems.map(function(el){
@@ -60,11 +62,31 @@ ToDoList.prototype.add = function(itemObject) {
  * @returns {ToDoList}
  */
 ToDoList.prototype.remove = function(itemUID) {
-  this.toDoItems = this.toDoItems.filter(function(el){
-    return el.UID !== itemUID;
-  });
+
+  this.toDoItems = this.toDoItems.filter(el => el.UID !== itemUID);
 
   return this;
+};
+
+/**
+ * Removes all completed tasks.
+ *
+ * @returns {ToDoList}
+ */
+ToDoList.prototype.clearCompleted = function () {
+
+  this.toDoItems = this.toDoItems.filter(el => !el.completed);
+
+  return this;
+};
+
+/**
+ * Returns true if some item is marked as completed
+ *
+ * @returns {boolean}
+ */
+ToDoList.prototype.hasCompletedItems = function () {
+  return this.toDoItems.some(el => el.completed );
 };
 
 /**
@@ -75,7 +97,7 @@ ToDoList.prototype.remove = function(itemUID) {
  * @returns {ToDoList}
  */
 ToDoList.prototype.edit = function(itemUID, edits) {
-  this.toDoItems = this.toDoItems.map(function(el){
+  this.toDoItems = this.toDoItems.map(el => {
     if (el.UID === itemUID) {
       for (var itemProperty in edits) {
         el[itemProperty] = edits[itemProperty];
@@ -95,7 +117,7 @@ ToDoList.prototype.edit = function(itemUID, edits) {
  * @returns {ToDoList}
  */
 ToDoList.prototype.complete = function(itemUID) {
-  this.toDoItems = this.toDoItems.map(function(el){
+  this.toDoItems = this.toDoItems.map(el => {
     if (el.UID == itemUID) {
       el.completed = true;
       return el;
@@ -114,7 +136,7 @@ ToDoList.prototype.complete = function(itemUID) {
  * @returns {ToDoList}
  */
 ToDoList.prototype.notComplete = function(itemUID) {
-  this.toDoItems = this.toDoItems.map(function(el){
+  this.toDoItems = this.toDoItems.map(el => {
     if (el.UID == itemUID) {
       delete el.completed;
       return el;
@@ -157,9 +179,7 @@ ToDoList.prototype.render = function(templateID){
  */
 ToDoList.prototype.renderEditable = function(templateID, itemUID) {
   var template = $('#' + templateID).html();
-  var entryToEdit = this.toDoItems.filter(function(el){
-    return el.UID == itemUID;
-  });
+  var entryToEdit = this.toDoItems.filter(el => el.UID == itemUID);
   var view = {
     'items' : entryToEdit
   };
@@ -260,7 +280,7 @@ ToDoList.prototype.sortIncompleteBy = function(attribute, order) {
  * @returns {ToDoList}
  */
 ToDoList.prototype.sortByUID = function(UIDs) {
-  this.toDoItems = this.toDoItems.map(function(el){
+  this.toDoItems = this.toDoItems.map(el => {
     if (el.firstCompletedItem) {
       delete el.firstCompletedItem;
       return el
@@ -286,7 +306,7 @@ ToDoList.prototype.sortByUID = function(UIDs) {
  * @returns {ToDoList}
  */
 ToDoList.prototype.markFirstCompleted = function() {
-  this.toDoItems = this.toDoItems.map(function(el){
+  this.toDoItems = this.toDoItems.map(el => {
     if (el.firstCompletedItem) {
       delete el.firstCompletedItem;
       return el
@@ -304,6 +324,3 @@ ToDoList.prototype.markFirstCompleted = function() {
 
   return this;
 };
-
-/*
-export {ToDoList};*/
