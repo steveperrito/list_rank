@@ -9,5 +9,9 @@ $ npm install
 ```
 Run webpack
 ```bash
-$ webpack
+$ npm run build
+```
+For minified build:
+```bash
+$ npm run build-p
 ```
