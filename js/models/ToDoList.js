@@ -35,7 +35,7 @@ ToDoList.prototype.save = function(){
     localStorage.setItem('ToDoList', JSON.stringify(this.toDoItems));
   }
   catch(e){
-    throw e;
+    return alert('error' + ' ' + e.message);
   }
 
   return true;

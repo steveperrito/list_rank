@@ -15,3 +15,8 @@ For minified build:
 ```bash
 $ npm run build-p
 ```
+
+... Or Watch Mode:
+```bash
+$ npm run dev
+```
